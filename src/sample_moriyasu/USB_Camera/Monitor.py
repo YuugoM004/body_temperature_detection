@@ -4,10 +4,20 @@ import cv2
 print(cv2.__version__)
 from PIL import ImageFont, ImageDraw, Image
 import numpy as np
+import matplotlib.pyplot as plt
 
-def Make_Camera_Tthermography(frame, WIDTH, HEIGHT):
+def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
 
     # サーモグラフィー表示
+
+    # bicubic補間したデータ
+    fig = plt.imshow(sensor_pixels, cmap="inferno", interpolation="bicubic")
+    plt.colorbar()
+
+    # plt.showだと止まってしまうので、pauseを使用
+    # plt.clfしないとカラーバーが多数表示される
+    plt.pause(.1)
+    plt.clf()
 
     # グレースケール表示
     resize_width = 200
@@ -26,10 +36,11 @@ def Make_Camera_Tthermography(frame, WIDTH, HEIGHT):
 
     return frame
 
-def Monitor_Func(cap, WIDTH, HEIGHT, MaxTemp, STATUS, DETECT_TH):
+def Monitor_Func(cap, WIDTH, HEIGHT, max_temp, STATUS, DETECT_TH, sensor_pixels):
 
     print ("### Monitor_Func ###")
     print ("STATUS:" + STATUS)
+    print ("センサ最高温度:" + str(max_temp))
 
     while True:
 
@@ -44,7 +55,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, MaxTemp, STATUS, DETECT_TH):
             print ("STATUS:" + STATUS)
         
             # カメラ画像とサーモグラフィー表示
-            result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT)
+            result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
 
             # 画像表示
             cv2.imshow('BodyTemperatureDetection', result_frame)
@@ -54,7 +65,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, MaxTemp, STATUS, DETECT_TH):
             print ("STATUS:" + STATUS)
 
             # カメラ画像とサーモグラフィー表示
-            result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT)
+            result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
 
             # 測定中を表示
             font_path = "/usr/share/fonts/truetype/meiryo.ttc"
@@ -74,13 +85,13 @@ def Monitor_Func(cap, WIDTH, HEIGHT, MaxTemp, STATUS, DETECT_TH):
             print ("STATUS:" + STATUS)
 
             # カメラ画像とサーモグラフィー表示
-            result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT)
+            result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
 
             # 最高温度表示
-            MaxTempStr = str(MaxTemp) + "℃"
+            MaxTempStr = str(max_temp) + "℃"
 
             # 温度によって、表示するテキストの色を変える
-            if(MaxTemp >= DETECT_TH):
+            if(max_temp >= DETECT_TH):
                 TextColor = (0, 0, 255)         # 赤
                 DetectResult = "正確な検温を行ってください。"
             else:
