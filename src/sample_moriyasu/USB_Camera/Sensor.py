@@ -1,13 +1,13 @@
 # coding: utf-8
 
 import time
-#import busio
-#import board
+import busio
+import board
 
 #import cv2
 
 # センサ接続に必要
-#import adafruit_amg88xx
+import adafruit_amg88xx
 
 import matplotlib.pyplot as plt
 
