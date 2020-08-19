@@ -46,12 +46,12 @@ def main():
             cap = Camera.Camera_Func(DEVICE_ID, WIDTH, HEIGHT, FPS)
 
             # センサ制御
-            STATUS, MaxTemp = Sensor.Sensor_Func(DETECT_START_END_TH)
+            sensor_pixels, max_temp, STATUS = Sensor.Sensor_Func(DETECT_START_END_TH)
             print ("STATUS:" + STATUS)
-            print ("最高温度:" + str(MaxTemp))
+            print ("最高温度:" + str(max_temp))
 
             # モニタ制御
-            Monitor.Monitor_Func(cap, WIDTH, HEIGHT, MaxTemp, STATUS, DETECT_TH)
+            Monitor.Monitor_Func(cap, WIDTH, HEIGHT, max_temp, STATUS, DETECT_TH, sensor_pixels)
 
     # 終了処理
     # "Ctrl+C"でループから抜ける
