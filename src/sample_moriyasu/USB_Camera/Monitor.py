@@ -25,25 +25,25 @@ def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
     measure_start_time = time.time()
     plt.pause(.1)
     elapsed_time = time.time() - measure_start_time
-    print ("  pause":{0}".format(elapsed_time) + "[sec]")
+    print ("  pause:{0}".format(elapsed_time) + "[sec]")
 
     measure_start_time = time.time()
     plt.clf()
     elapsed_time = time.time() - measure_start_time
-    print ("  clf":{0}".format(elapsed_time) + "[sec]")
+    print ("  clf:{0}".format(elapsed_time) + "[sec]")
 
     # グレースケール表示
     measure_start_time = time.time()
-    resize_width = 200
-    resize_height = 200
+    resize_width = 160
+    resize_height = 160
     frame_resize = cv2.resize(frame,(resize_width, resize_height))
     elapsed_time = time.time() - measure_start_time
-    print ("  resize":{0}".format(elapsed_time) + "[sec]")
+    print ("  resize:{0}".format(elapsed_time) + "[sec]")
 
     measure_start_time = time.time()
     frame_resized_gray = cv2.cvtColor(frame_resize,cv2.COLOR_BGR2GRAY)
     elapsed_time = time.time() - measure_start_time
-    print ("  cvtColor":{0}".format(elapsed_time) + "[sec]")
+    print ("  cvtColor:{0}".format(elapsed_time) + "[sec]")
 
     # グレースケール(2次元配列)をRGB(3次元配列)に変換する
     measure_start_time = time.time()
@@ -55,7 +55,7 @@ def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
 
     frame[y_offset:height + y_offset, x_offset:width + x_offset] = frame_resized_gray_array
     elapsed_time = time.time() - measure_start_time
-    print ("  other":{0}".format(elapsed_time) + "[sec]")
+    print ("  other:{0}".format(elapsed_time) + "[sec]")
 
     return frame
 
