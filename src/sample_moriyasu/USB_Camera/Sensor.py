@@ -4,6 +4,8 @@ import time
 import busio
 import board
 
+import itertools
+
 #import cv2
 
 # センサ接続に必要
@@ -40,7 +42,7 @@ def Sensor_Func(DETECT_START_END_TH):
      #                 [26.0,  26.5,  26.0,  26.5,  26.5,  26.75, 26.75, 27.75]]
 
      # 最高温度の計算
-     max_temp = max(max(sensor_pixels))
+     max_temp = max(itertools.chain.from_iterable(sensor_pixels))
      print ("センサ最高温度:" + str(max_temp))
 
      # 8x8ピクセルの画像とbicubic補間をした画像を並べて表示させる
