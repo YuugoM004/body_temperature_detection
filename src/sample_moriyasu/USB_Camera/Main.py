@@ -11,11 +11,11 @@ import Monitor
 # デバイスID
 DEVICE_ID = 0
 # ウインドウの幅
-WIDTH = 800
+WIDTH = 640
 # ウインドウの高さ
-HEIGHT = 600
+HEIGHT = 480
  # フレームレート
-FPS = 24
+FPS = 10
 ###################################################
 # ステータス(WAIT/DETECT/FINISH)
 STATUS = "NONE"
