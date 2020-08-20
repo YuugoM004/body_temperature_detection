@@ -6,26 +6,47 @@ from PIL import ImageFont, ImageDraw, Image
 import numpy as np
 import matplotlib.pyplot as plt
 
+import time
+
 def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
 
     # サーモグラフィー表示
 
     # bicubic補間したデータ
+    measure_start_time = time.time()
     fig = plt.imshow(sensor_pixels, cmap="inferno", interpolation="bicubic")
-    plt.colorbar()
+    elapsed_time = time.time() - measure_start_time
+    print ("  imshow:{0}".format(elapsed_time) + "[sec]")
+
+    # plt.colorbar()
 
     # plt.showだと止まってしまうので、pauseを使用
     # plt.clfしないとカラーバーが多数表示される
+    measure_start_time = time.time()
     plt.pause(.1)
+    elapsed_time = time.time() - measure_start_time
+    print ("  pause":{0}".format(elapsed_time) + "[sec]")
+
+    measure_start_time = time.time()
     plt.clf()
+    elapsed_time = time.time() - measure_start_time
+    print ("  clf":{0}".format(elapsed_time) + "[sec]")
 
     # グレースケール表示
+    measure_start_time = time.time()
     resize_width = 200
     resize_height = 200
     frame_resize = cv2.resize(frame,(resize_width, resize_height))
+    elapsed_time = time.time() - measure_start_time
+    print ("  resize":{0}".format(elapsed_time) + "[sec]")
+
+    measure_start_time = time.time()
     frame_resized_gray = cv2.cvtColor(frame_resize,cv2.COLOR_BGR2GRAY)
+    elapsed_time = time.time() - measure_start_time
+    print ("  cvtColor":{0}".format(elapsed_time) + "[sec]")
 
     # グレースケール(2次元配列)をRGB(3次元配列)に変換する
+    measure_start_time = time.time()
     frame_resized_gray_array = frame_resized_gray[:, :, None]
 
     height, width = frame_resized_gray.shape
@@ -33,6 +54,8 @@ def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
     y_offset = HEIGHT - resize_height
 
     frame[y_offset:height + y_offset, x_offset:width + x_offset] = frame_resized_gray_array
+    elapsed_time = time.time() - measure_start_time
+    print ("  other":{0}".format(elapsed_time) + "[sec]")
 
     return frame
 
@@ -41,6 +64,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp, STATUS, DETECT_TH, sensor_pixels)
     print ("### Monitor_Func ###")
     print ("STATUS:" + STATUS)
     print ("センサ最高温度:" + str(max_temp))
+
+    plt.figure(figsize=(1, 1), dpi=160)
 
     while True:
 
@@ -85,8 +110,12 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp, STATUS, DETECT_TH, sensor_pixels)
             print ("STATUS:" + STATUS)
 
             # カメラ画像とサーモグラフィー表示
+            measure_start_time = time.time()
             result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
+            elapsed_time = time.time() - measure_start_time
+            print ("1(Make_Camera_Tthermography):{0}".format(elapsed_time) + "[sec]")
 
+            measure_start_time = time.time()
             # 最高温度表示
             MaxTempStr = str(max_temp) + "℃"
 
@@ -101,21 +130,32 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp, STATUS, DETECT_TH, sensor_pixels)
             font_path = "/usr/share/fonts/truetype/meiryo.ttc"
             font_size = 40
             font_pil = ImageFont.truetype(font_path, font_size)
+            elapsed_time = time.time() - measure_start_time
+            print ("2:{0}".format(elapsed_time) + "[sec]")
 
+            measure_start_time = time.time()
             img_pil = Image.fromarray(result_frame)
             draw = ImageDraw.Draw(img_pil)
             positon = (10,300)
             draw.text(positon, MaxTempStr, font = font_pil, fill = TextColor)
             img = np.array(img_pil)
+            elapsed_time = time.time() - measure_start_time
+            print ("3:{0}".format(elapsed_time) + "[sec]")
 
             # 測定結果表示
+            measure_start_time = time.time()
             img_pil = Image.fromarray(img)
             draw = ImageDraw.Draw(img_pil)
             positon = (10,350)
             draw.text(positon, DetectResult, font = font_pil, fill = TextColor)
             img = np.array(img_pil)     
+            elapsed_time = time.time() - measure_start_time
+            print ("4:{0}".format(elapsed_time) + "[sec]")
 
+            measure_start_time = time.time()
             cv2.imshow('BodyTemperatureDetection_Finish', img)
+            elapsed_time = time.time() - measure_start_time
+            print ("5(imshow):{0}".format(elapsed_time) + "[sec]")
         
         # キュー入力判定
         # "q"でループから抜ける
