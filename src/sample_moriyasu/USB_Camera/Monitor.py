@@ -11,6 +11,8 @@ import adafruit_amg88xx
 
 import time
 import itertools
+import busio
+import board
 
 def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
 
@@ -69,6 +71,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     print ("STATUS:" + STATUS)
 
     ## 本来はSensor.pyでやる処理だが、デバッグ用にここでセンサのインスタンスを取得
+    # I2Cバスの初期化
+    i2c_bus = busio.I2C(board.SCL, board.SDA)
     # センサーの初期化
     sensor = adafruit_amg88xx.AMG88XX(i2c_bus, addr=0x68)
     # センサーの初期化待ち
