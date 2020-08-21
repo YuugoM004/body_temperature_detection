@@ -29,7 +29,7 @@ def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
     # plt.showだと止まってしまうので、pauseを使用
     # plt.clfしないとカラーバーが多数表示される
     measure_start_time = time.time()
-    plt.pause(.1)
+    plt.pause(0.01)
     elapsed_time = time.time() - measure_start_time
     print ("  pause:{0}".format(elapsed_time) + "[sec]")
 
