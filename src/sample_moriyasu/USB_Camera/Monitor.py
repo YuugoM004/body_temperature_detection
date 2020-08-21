@@ -103,6 +103,78 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
         print ("GetSensorData & CalcMaxTemp:{0}".format(elapsed_time) + "[sec]")
         ## ここまで
 
+        if(STATUS == "INITIALIZE_CHECKING"):
+            print ("STATUS:" + STATUS)
+
+            # 黒背景の画像(ブランク画像)作成
+            width = 640
+            height = 480
+            blank = np.zeros((height, width, 3), np.uint8)
+
+            # メッセージを表示
+            font_path = "/usr/share/fonts/truetype/meiryo.ttc"
+            font_size = 25
+            font_pil = ImageFont.truetype(font_path, font_size)
+            TextColor = (255, 255, 255)         # 白
+            Text = "暫くお待ちください"
+
+            img_pil = Image.fromarray(blank)
+            draw = ImageDraw.Draw(img_pil)
+            positon = (200,200)
+            draw.text(positon, Text, font = font_pil, fill = TextColor)
+            img = np.array(img_pil)
+            cv2.imshow("InitializeCheckingScreen", img)
+            # ウインドウ表示位置指定
+            cv2.moveWindow("InitializeCheckingScreen", window_display_pos_x,window_display_pos_y)
+
+        if(STATUS == "INITIALIZE_CHECKINED"):
+            print ("STATUS:" + STATUS)
+
+            # 黒背景の画像(ブランク画像)作成
+            width = 640
+            height = 480
+            blank = np.zeros((height, width, 3), np.uint8)
+
+            # 接続確認の結果を表示
+            font_path = "/usr/share/fonts/truetype/meiryo.ttc"
+            font_size = 20
+            font_pil = ImageFont.truetype(font_path, font_size)
+            TextColor = (255, 255, 255)         # 白
+
+            if(camera_connect_check_result):
+                camera_text = " カメラの接続に成功しました"
+            else:
+                camera_text = " カメラの接続に失敗しました"
+
+            if(sensor_connect_check_result):
+                sensor_text = " センサの接続に成功しました"
+            else:
+                sensor_text = " センサの接続に失敗しました"
+            
+            img_pil = Image.fromarray(blank)
+            draw = ImageDraw.Draw(img_pil)
+            positon = (180,200)
+            draw.text(positon, camera_text, font = font_pil, fill = TextColor)
+            img = np.array(img_pil)
+
+            img_pil = Image.fromarray(img)
+            draw = ImageDraw.Draw(img_pil)
+            positon = (180,230)
+            draw.text(positon, sensor_text, font = font_pil, fill = TextColor)
+            img = np.array(img_pil)
+
+            if((camera_connect_check_result == False) or (sensor_connect_check_result == False)):
+                reboot_text = "電源OFF後、接続を確認して再度電源ONしてください"
+                
+                img_pil = Image.fromarray(img)
+                draw = ImageDraw.Draw(img_pil)
+                positon = (80,270)
+                draw.text(positon, reboot_text, font = font_pil, fill = TextColor)
+                img = np.array(img_pil)
+
+            cv2.imshow("InitializeCheckedScreen", img)
+            # ウインドウ表示位置指定
+            cv2.moveWindow("InitializeCheckedScreen", window_display_pos_x,window_display_pos_y)
 
         if(STATUS == "WAIT"):
             print ("STATUS:" + STATUS)
