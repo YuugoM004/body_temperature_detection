@@ -165,15 +165,18 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
         #print ("センサ最高温度:" + str(max_temp))
         #elapsed_time = time.time() - measure_start_time
         #print ("GetSensorData & CalcMaxTemp:{0}".format(elapsed_time) + "[sec]")
-
-        ## テストようにmax_tempの値を30に固定
-        max_temp = 30
-        
         ## ここまで
 
         ######################  Pygameお試し ############################
         #read the pixels
+        measure_start_time = time.time()
         pixels = sensor.readPixels()
+        print (pixels)
+        max_temp = max(pixels)
+        print ("センサ最高温度:" + str(max_temp))
+        elapsed_time = time.time() - measure_start_time
+        print ("GetSensorData & ChooseMaxTemp:{0}".format(elapsed_time) + "[sec]")
+
         pixels = [map(p, MINTEMP, MAXTEMP, 0, COLORDEPTH - 1) for p in pixels]
 	
         #perdorm interpolation
