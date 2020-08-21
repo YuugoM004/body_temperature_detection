@@ -71,6 +71,10 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     print ("### Monitor_Func ###")
     print ("STATUS:" + STATUS)
 
+    # ウインドウの表示位置
+    window_display_pos_x = 350
+    window_display_pos_y = 150
+
     ## 本来はSensor.pyでやる処理だが、デバッグ用にここでセンサのインスタンスを取得
     # I2Cバスの初期化
     i2c_bus = busio.I2C(board.SCL, board.SDA)
@@ -184,7 +188,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
             # 画像表示
             cv2.imshow('BodyTemperatureDetection', result_frame)
-
+            # ウインドウ表示位置指定
+            cv2.moveWindow("BodyTemperatureDetection", window_display_pos_x,window_display_pos_y)
 
         if(STATUS == "DETECT"):
             print ("STATUS:" + STATUS)
@@ -205,6 +210,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             draw.text(positon, Text, font = font_pil, fill = TextColor)
             img = np.array(img_pil)
             cv2.imshow('BodyTemperatureDetection_Text_Detect', img)
+            # ウインドウ表示位置指定
+            cv2.moveWindow("BodyTemperatureDetection_Text_Detect", window_display_pos_x,window_display_pos_y)
 
         if(STATUS == "FINISH"):
             print ("STATUS:" + STATUS)
@@ -254,6 +261,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
             measure_start_time = time.time()
             cv2.imshow('BodyTemperatureDetection_Finish', img)
+            # ウインドウ表示位置指定
+            cv2.moveWindow("BodyTemperatureDetection_Finish", window_display_pos_x,window_display_pos_y)
             elapsed_time = time.time() - measure_start_time
             print ("5(imshow):{0}".format(elapsed_time) + "[sec]")
         
