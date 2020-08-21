@@ -65,6 +65,9 @@ def Sensor_Func(DETECT_START_END_TH):
 
      #############################################
      #MAX_TEMP = 36.7
+
+     #STATUS = "INITIALIZE_CHECKING"
+     #STATUS = "INITIALIZE_CHECKINED"
      #STATUS = "WAIT"
      #STATUS = "DETECT"
      STATUS = "FINISH"
