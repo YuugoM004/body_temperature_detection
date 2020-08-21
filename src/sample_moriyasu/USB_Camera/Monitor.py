@@ -20,7 +20,8 @@ def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
 
     # bicubic補間したデータ
     measure_start_time = time.time()
-    fig = plt.imshow(sensor_pixels, cmap="inferno", interpolation="bicubic")
+    sensor_pixels_rotate = np.rot90(sensor_pixels, -1)
+    fig = plt.imshow(sensor_pixels_rotate, cmap="inferno", interpolation="bicubic")
     elapsed_time = time.time() - measure_start_time
     print ("  imshow:{0}".format(elapsed_time) + "[sec]")
 
