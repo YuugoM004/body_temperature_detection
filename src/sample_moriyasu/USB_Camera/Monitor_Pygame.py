@@ -208,14 +208,14 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
             # 測定中を表示
             font_path = "/usr/share/fonts/truetype/meiryo.ttc"
-            font_size = 40
+            font_size = 25
             font_pil = ImageFont.truetype(font_path, font_size)
             TextColor = (255, 255, 255)         # 白
             Text = "測定中"
 
             img_pil = Image.fromarray(result_frame)
             draw = ImageDraw.Draw(img_pil)
-            positon = (10,350)
+            positon = (10,280)
             draw.text(positon, Text, font = font_pil, fill = TextColor)
             img = np.array(img_pil)
             cv2.imshow('BodyTemperatureDetection_Text_Detect', img)
@@ -242,7 +242,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
                 DetectResult = "平熱です。"
 
             font_path = "/usr/share/fonts/truetype/meiryo.ttc"
-            font_size = 40
+            font_size = 25
             font_pil = ImageFont.truetype(font_path, font_size)
             elapsed_time = time.time() - measure_start_time
             print ("2:{0}".format(elapsed_time) + "[sec]")
@@ -250,7 +250,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             measure_start_time = time.time()
             img_pil = Image.fromarray(result_frame)
             draw = ImageDraw.Draw(img_pil)
-            positon = (10,300)
+            positon = (10,250)
             draw.text(positon, MaxTempStr, font = font_pil, fill = TextColor)
             img = np.array(img_pil)
             elapsed_time = time.time() - measure_start_time
@@ -260,7 +260,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             measure_start_time = time.time()
             img_pil = Image.fromarray(img)
             draw = ImageDraw.Draw(img_pil)
-            positon = (10,350)
+            positon = (10,280)
             draw.text(positon, DetectResult, font = font_pil, fill = TextColor)
             img = np.array(img_pil)     
             elapsed_time = time.time() - measure_start_time
