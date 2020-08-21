@@ -53,33 +53,35 @@ def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
     #elapsed_time = time.time() - measure_start_time
     #print ("  clf:{0}".format(elapsed_time) + "[sec]")
 
+    # カメラ画像を左右反転
+    frame_flip_lr = cv2.flip(frame, 1)
 
     # グレースケール表示
     measure_start_time = time.time()
     resize_width = 160
     resize_height = 160
-    frame_resize = cv2.resize(frame,(resize_width, resize_height))
+    frame_flip_lr_resize = cv2.resize(frame_flip_lr,(resize_width, resize_height))
     elapsed_time = time.time() - measure_start_time
     print ("  resize:{0}".format(elapsed_time) + "[sec]")
 
     measure_start_time = time.time()
-    frame_resized_gray = cv2.cvtColor(frame_resize,cv2.COLOR_BGR2GRAY)
+    frame_flip_lr_resize_gray = cv2.cvtColor(frame_flip_lr_resize,cv2.COLOR_BGR2GRAY)
     elapsed_time = time.time() - measure_start_time
     print ("  cvtColor:{0}".format(elapsed_time) + "[sec]")
 
     # グレースケール(2次元配列)をRGB(3次元配列)に変換する
     measure_start_time = time.time()
-    frame_resized_gray_array = frame_resized_gray[:, :, None]
+    frame_flip_lr_resize_gray_array = frame_flip_lr_resize_gray[:, :, None]
 
-    height, width = frame_resized_gray.shape
+    height, width = frame_flip_lr_resize_gray.shape
     x_offset = 0
     y_offset = HEIGHT - resize_height
 
-    frame[y_offset:height + y_offset, x_offset:width + x_offset] = frame_resized_gray_array
+    frame_flip_lr[y_offset:height + y_offset, x_offset:width + x_offset] = frame_flip_lr_resize_gray_array
     elapsed_time = time.time() - measure_start_time
     print ("  other:{0}".format(elapsed_time) + "[sec]")
 
-    return frame
+    return frame_flip_lr
 
 def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pixels):
 
