@@ -6,7 +6,11 @@ from PIL import ImageFont, ImageDraw, Image
 import numpy as np
 import matplotlib.pyplot as plt
 
+# センサ接続に必要
+import adafruit_amg88xx
+
 import time
+import itertools
 
 def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
 
@@ -59,11 +63,17 @@ def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
 
     return frame
 
-def Monitor_Func(cap, WIDTH, HEIGHT, max_temp, STATUS, DETECT_TH, sensor_pixels):
+def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pixels):
 
     print ("### Monitor_Func ###")
     print ("STATUS:" + STATUS)
-    print ("センサ最高温度:" + str(max_temp))
+
+    ## 本来はSensor.pyでやる処理だが、デバッグ用にここでセンサのインスタンスを取得
+    # センサーの初期化
+    sensor = adafruit_amg88xx.AMG88XX(i2c_bus, addr=0x68)
+    # センサーの初期化待ち
+    time.sleep(.1)
+    ## ここまで
 
     plt.figure(figsize=(1, 1), dpi=160)
 
@@ -74,6 +84,19 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp, STATUS, DETECT_TH, sensor_pixels)
         _, frame = cap.read()
         if(frame is None):
             continue
+
+        ## 本来はSensor.pyでやる処理だが、デバッグ用にここでセンサデータを取得
+        # 8x8の表示
+        # print (sensor.pixels)
+
+        # 温度データ取得＆最高温度の計算
+        measure_start_time = time.time()
+        sensor_pixels = sensor.pixels
+        max_temp = max(itertools.chain.from_iterable(sensor_pixels))
+        print ("センサ最高温度:" + str(max_temp))
+        elapsed_time = time.time() - measure_start_time
+        print ("GetSensorData & CalcMaxTemp:{0}".format(elapsed_time) + "[sec]")
+        ## ここまで
 
 
         if(STATUS == "WAIT"):
