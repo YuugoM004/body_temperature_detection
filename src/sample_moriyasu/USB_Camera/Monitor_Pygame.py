@@ -163,22 +163,26 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
         #print ("センサ最高温度:" + str(max_temp))
         #elapsed_time = time.time() - measure_start_time
         #print ("GetSensorData & CalcMaxTemp:{0}".format(elapsed_time) + "[sec]")
+
+        ## テストようにmax_tempの値を30に固定
+        max_temp = 30
+        
         ## ここまで
 
         ######################  Pygameお試し ############################
-	    #read the pixels
-	    pixels = sensor.readPixels()
-	    pixels = [map(p, MINTEMP, MAXTEMP, 0, COLORDEPTH - 1) for p in pixels]
+        #read the pixels
+        pixels = sensor.readPixels()
+        pixels = [map(p, MINTEMP, MAXTEMP, 0, COLORDEPTH - 1) for p in pixels]
 	
-	    #perdorm interpolation
-	    bicubic = griddata(points, pixels, (grid_x, grid_y), method='cubic')
+        #perdorm interpolation
+        bicubic = griddata(points, pixels, (grid_x, grid_y), method='cubic')
 	
-	    #draw everything
-	    for ix, row in enumerate(bicubic):
-		    for jx, pixel in enumerate(row):
-			    pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (displayPixelHeight * ix, displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
+        #draw everything
+        for ix, row in enumerate(bicubic):
+            for jx, pixel in enumerate(row):
+                pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (displayPixelHeight * ix, displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
 	
-	    pygame.display.update()
+        pygame.display.update()
         ######################  Pygameお試し ############################
 
         if(STATUS == "WAIT"):
