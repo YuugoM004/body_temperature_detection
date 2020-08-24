@@ -27,6 +27,18 @@ def constrain(val, min_val, max_val):
 def map(x, in_min, in_max, out_min, out_max):
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
+def convert_opencv_img_to_pygame(opencv_image):
+    """
+    OpenCVの画像をPygame用に変換.
+
+    see https://blanktar.jp/blog/2016/01/pygame-draw-opencv-image.html
+    """
+    opencv_image = opencv_image[:,:,::-1]  # OpenCVはBGR、pygameはRGBなので変換してやる必要がある。
+    shape = opencv_image.shape[1::-1]  # OpenCVは(高さ, 幅, 色数)、pygameは(幅, 高さ)なのでこれも変換。
+    pygame_image = pygame.image.frombuffer(opencv_image.tostring(), shape, 'RGB')
+
+    return pygame_image
+
 ######################  Pygameお試し ############################
 
 def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
