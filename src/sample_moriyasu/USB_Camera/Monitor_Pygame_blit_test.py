@@ -216,8 +216,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             pygame_image = convert_opencv_img_to_pygame(result_frame)
 
             # 画像を描画
-            screen.blit(pygame_image, (0, 0))
-            screen.blit(pygame_image_bicubic, (50, 50))
+            lcd.blit(pygame_image, (0, 0))
+            lcd.blit(pygame_image_bicubic, (50, 50))
             pygame.display.update()  # 画面を更新
 
             # 画像表示
