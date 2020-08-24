@@ -125,11 +125,9 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     grid_x, grid_y = np.mgrid[0:7:32j, 0:7:32j]
 
     #sensor is an 8x8 grid so lets do a square
-    #height = 240
-    #width = 240
-    height = 640
-    width = 480
-
+    width = 640
+    height = 480
+    
     #the list of colors we can choose from
     blue = Color("indigo")
     colors = list(blue.range_to(Color("red"), COLORDEPTH))
@@ -137,10 +135,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     #create the array of colors
     colors = [(int(c.red * 255), int(c.green * 255), int(c.blue * 255)) for c in colors]
 
-    #displayPixelWidth = width / 30
-    #displayPixelHeight = height / 30
-    displayPixelWidth = 8
-    displayPixelHeight = 8
+    displayPixelHeight = 160 / 8
+    displayPixelWidth = 160 / 8
 
     lcd = pygame.display.set_mode((width, height))
 
@@ -214,23 +210,31 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             print ("STATUS:" + STATUS)
         
             # カメラ画像とサーモグラフィー表示
-            result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
+            #result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
+            result_frame = frame
 
             # OpenCVの画像をPygame用に変換
             pygame_image = convert_opencv_img_to_pygame(result_frame)
 
-            # 画像を描画
-            lcd.blit(pygame_image, (0, 0))
-            #lcd.blit(pygame_image_bicubic, (50, 50))
-            for ix, row in enumerate(bicubic):
+            # カメラ表示
+            screen.blit(pygame_image, (0, 0))
+
+            # サーモ表示 ##########################################################################
+            thermo_offset_x = 0
+            thermo_offset_y = 480 - 160
+
+            for ix, row in enumerate(sensor_pixels):
                 for jx, pixel in enumerate(row):
-                    pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (displayPixelHeight * ix, displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
-  
-            pygame.display.update()  # 画面を更新
+                    pygame.draw.rect(screen, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
+            # サーモ表示 ##########################################################################
+
+            # 画面を更新
+            pygame.display.update()
 
             # 画像表示
-            #cv2.imshow('BodyTemperatureDetection', result_frame)
-
+            #cv2.imshow("BodyTemperatureDetection", result_frame)
+             # ウインドウ表示位置指定
+            #cv2.moveWindow("BodyTemperatureDetection", window_display_pos_x,window_display_pos_y)
 
         if(STATUS == "DETECT"):
             print ("STATUS:" + STATUS)
