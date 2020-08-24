@@ -125,8 +125,10 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     grid_x, grid_y = np.mgrid[0:7:32j, 0:7:32j]
 
     #sensor is an 8x8 grid so lets do a square
-    height = 240
-    width = 240
+    #height = 240
+    #width = 240
+    height = 640
+    width = 480
 
     #the list of colors we can choose from
     blue = Color("indigo")
@@ -135,8 +137,10 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     #create the array of colors
     colors = [(int(c.red * 255), int(c.green * 255), int(c.blue * 255)) for c in colors]
 
-    displayPixelWidth = width / 30
-    displayPixelHeight = height / 30
+    #displayPixelWidth = width / 30
+    #displayPixelHeight = height / 30
+    displayPixelWidth = 8
+    displayPixelHeight = 8
 
     lcd = pygame.display.set_mode((width, height))
 
