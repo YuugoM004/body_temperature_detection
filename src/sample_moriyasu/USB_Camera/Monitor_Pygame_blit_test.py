@@ -213,11 +213,15 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
 
             # OpenCVの画像をPygame用に変換
-            pygame_image = convert_opencv_img_to_pygame(result_frame)
+            #pygame_image = convert_opencv_img_to_pygame(result_frame)
 
             # 画像を描画
             lcd.blit(pygame_image, (0, 0))
-            lcd.blit(pygame_image_bicubic, (50, 50))
+            #lcd.blit(pygame_image_bicubic, (50, 50))
+            for ix, row in enumerate(bicubic):
+                for jx, pixel in enumerate(row):
+                    pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (displayPixelHeight * ix, displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
+  
             pygame.display.update()  # 画面を更新
 
             # 画像表示
