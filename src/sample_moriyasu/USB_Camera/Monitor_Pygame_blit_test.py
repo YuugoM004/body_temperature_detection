@@ -267,9 +267,12 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             # カメラ画像とサーモグラフィー表示
             measure_start_time = time.time()
             #result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
-            result_frame = frame
+            #result_frame = frame
             elapsed_time = time.time() - measure_start_time
             print ("1(Make_Camera_Tthermography):{0}".format(elapsed_time) + "[sec]")
+
+            # カメラ画像を左右反転
+            frame_flip_lr = cv2.flip(frame, 1)
 
             measure_start_time = time.time()
             # 最高温度表示
@@ -311,7 +314,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             #print ("4:{0}".format(elapsed_time) + "[sec]")
 
             # OpenCVの画像をPygame用に変換
-            pygame_image = convert_opencv_img_to_pygame(result_frame)
+            pygame_image = convert_opencv_img_to_pygame(frame_flip_lr)
 
             # カメラ表示
             lcd.blit(pygame_image, (0, 0))
@@ -337,7 +340,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             lcd.blit(text1, (0,260))
             lcd.blit(text2, (0,290))
             # 文字表示 #############################
-            
+
             # 顔枠を表示
             pygame.draw.rect(lcd, (0, 0, 255), (220, 140, 200, 200), 3)
 
