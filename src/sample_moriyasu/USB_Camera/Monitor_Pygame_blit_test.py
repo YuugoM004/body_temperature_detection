@@ -140,6 +140,11 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
     lcd = pygame.display.set_mode((width, height))
 
+    # 全画面表示
+    #lcd = pygame.display.set_mode((0,0))
+    #lcd = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+    #lcd = pygame.display.set_mode((640,480), pygame.FULLSCREEN)
+
     lcd.fill((255,0,0))
 
     pygame.display.update()
@@ -331,7 +336,10 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
             lcd.blit(text1, (0,260))
             lcd.blit(text2, (0,290))
-            # 文字表示 #############################        
+            # 文字表示 #############################
+            
+            # 顔枠を表示
+            pygame.draw.rect(lcd, (0, 0, 255), (220, 140, 200, 200), 3)
 
             # 画面を更新
             pygame.display.update()
