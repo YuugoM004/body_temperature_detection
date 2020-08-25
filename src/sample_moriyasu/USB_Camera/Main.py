@@ -4,7 +4,7 @@ import cv2
 #print(cv2.__version__) 
 import Camera
 import Sensor
-import Monitor_Pygame
+import Monitor_Pygame_blit_test
 
 ###################################################
 # USBカメラ設定
@@ -22,7 +22,7 @@ STATUS = "NONE"
 # 測定開始の閾値
 DETECT_START_END_TH = 35
 # 測定結果の閾値
-DETECT_TH = 37
+DETECT_TH = 37.5
 ###################################################
 
 def main():
@@ -51,7 +51,7 @@ def main():
             print ("最高温度:" + str(max_temp))
 
             # モニタ制御
-            Monitor_Pygame.Monitor_Func(cap, WIDTH, HEIGHT, max_temp, STATUS, DETECT_TH, sensor_pixels)
+            Monitor_Pygame_blit_test.Monitor_Func(cap, WIDTH, HEIGHT, max_temp, STATUS, DETECT_TH, sensor_pixels)
 
     # 終了処理
     # "Ctrl+C"でループから抜ける

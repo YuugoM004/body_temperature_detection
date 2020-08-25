@@ -24,7 +24,7 @@ from colour import Color
 def constrain(val, min_val, max_val):
     return min(max_val, max(min_val, val))
 
-def map(x, in_min, in_max, out_min, out_max):
+def mapping(x, in_min, in_max, out_min, out_max):
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 def convert_opencv_img_to_pygame(opencv_image):
@@ -107,7 +107,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     MINTEMP = 26
 
     #high range of the sensor (this will be red on the screen)
-    MAXTEMP = 32
+    MAXTEMP = 37.5
 
     #how many color values we can have
     COLORDEPTH = 1024
@@ -188,13 +188,14 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
         #read the pixels
         measure_start_time = time.time()
         pixels = sensor.readPixels()
+        pixels = list(map(lambda x: x + 5.0 if x >= 30.0 else x, pixels))
         print (pixels)
         max_temp = max(pixels)
         print ("センサ最高温度:" + str(max_temp))
         elapsed_time = time.time() - measure_start_time
         print ("GetSensorData & ChooseMaxTemp:{0}".format(elapsed_time) + "[sec]")
 
-        pixels = [map(p, MINTEMP, MAXTEMP, 0, COLORDEPTH - 1) for p in pixels]
+        pixels = [mapping(p, MINTEMP, MAXTEMP, 0, COLORDEPTH - 1) for p in pixels]
 	
         #perdorm interpolation
         bicubic = griddata(points, pixels, (grid_x, grid_y), method='cubic')
