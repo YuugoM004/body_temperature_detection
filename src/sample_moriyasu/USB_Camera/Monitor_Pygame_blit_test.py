@@ -217,7 +217,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             pygame_image = convert_opencv_img_to_pygame(result_frame)
 
             # カメラ表示
-            screen.blit(pygame_image, (0, 0))
+            lcd.blit(pygame_image, (0, 0))
 
             # サーモ表示 ##########################################################################
             thermo_offset_x = 0
@@ -225,7 +225,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
             for ix, row in enumerate(sensor_pixels):
                 for jx, pixel in enumerate(row):
-                    pygame.draw.rect(screen, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
+                    pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
             # サーモ表示 ##########################################################################
 
             # 画面を更新
@@ -309,15 +309,15 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             pygame_image = convert_opencv_img_to_pygame(result_frame)
 
             # カメラ表示
-            screen.blit(pygame_image, (0, 0))
+            lcd.blit(pygame_image, (0, 0))
 
             # サーモ表示 ##########################################################################
             thermo_offset_x = 0
             thermo_offset_y = 480 - 160
 
-            for ix, row in enumerate(sensor_pixels):
+            for ix, row in enumerate(bicubic):
                 for jx, pixel in enumerate(row):
-                    pygame.draw.rect(screen, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
+                    pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
             # サーモ表示 ##########################################################################
 
             # 文字表示(最高温度、測定結果) #############################
@@ -329,8 +329,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             font2 = pygame.font.SysFont("notosansmonocjkjp", 15, bold=True, italic=False)
             text2 = font2.render(DetectResult, True, TextColor, background_color)
 
-            screen.blit(text1, (0,260))
-            screen.blit(text2, (0,290))
+            lcd.blit(text1, (0,260))
+            lcd.blit(text2, (0,290))
             # 文字表示 #############################        
 
             # 画面を更新
