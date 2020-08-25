@@ -261,7 +261,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
             # カメラ画像とサーモグラフィー表示
             measure_start_time = time.time()
-            result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
+            #result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
+            result_frame = frame
             elapsed_time = time.time() - measure_start_time
             print ("1(Make_Camera_Tthermography):{0}".format(elapsed_time) + "[sec]")
 
@@ -270,42 +271,75 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             MaxTempStr = str(max_temp) + "℃"
 
             # 温度によって、表示するテキストの色を変える
+            background_color = (0, 0, 0)
             if(max_temp >= DETECT_TH):
-                TextColor = (0, 0, 255)         # 赤
+                #TextColor = (0, 0, 255)         # 赤
+                TextColor = (255, 0, 0)         # 赤
                 DetectResult = "正確な検温を行ってください。"
             else:
                 TextColor = (0, 255, 0)         # 緑
                 DetectResult = "平熱です。"
 
-            font_path = "/usr/share/fonts/truetype/meiryo.ttc"
-            font_size = 25
-            font_pil = ImageFont.truetype(font_path, font_size)
-            elapsed_time = time.time() - measure_start_time
-            print ("2:{0}".format(elapsed_time) + "[sec]")
+            #font_path = "/usr/share/fonts/truetype/meiryo.ttc"
+            #font_size = 25
+            #font_pil = ImageFont.truetype(font_path, font_size)
+            #elapsed_time = time.time() - measure_start_time
+            #print ("2:{0}".format(elapsed_time) + "[sec]")
 
-            measure_start_time = time.time()
-            img_pil = Image.fromarray(result_frame)
-            draw = ImageDraw.Draw(img_pil)
-            positon = (10,250)
-            draw.text(positon, MaxTempStr, font = font_pil, fill = TextColor)
-            img = np.array(img_pil)
-            elapsed_time = time.time() - measure_start_time
-            print ("3:{0}".format(elapsed_time) + "[sec]")
+            #measure_start_time = time.time()
+            #img_pil = Image.fromarray(result_frame)
+            #draw = ImageDraw.Draw(img_pil)
+            #positon = (10,250)
+            #draw.text(positon, MaxTempStr, font = font_pil, fill = TextColor)
+            #img = np.array(img_pil)
+            #elapsed_time = time.time() - measure_start_time
+            #print ("3:{0}".format(elapsed_time) + "[sec]")
 
             # 測定結果表示
-            measure_start_time = time.time()
-            img_pil = Image.fromarray(img)
-            draw = ImageDraw.Draw(img_pil)
-            positon = (10,280)
-            draw.text(positon, DetectResult, font = font_pil, fill = TextColor)
-            img = np.array(img_pil)     
-            elapsed_time = time.time() - measure_start_time
-            print ("4:{0}".format(elapsed_time) + "[sec]")
+            #measure_start_time = time.time()
+            #img_pil = Image.fromarray(img)
+            #draw = ImageDraw.Draw(img_pil)
+            #positon = (10,280)
+            #draw.text(positon, DetectResult, font = font_pil, fill = TextColor)
+            #img = np.array(img_pil)     
+            #elapsed_time = time.time() - measure_start_time
+            #print ("4:{0}".format(elapsed_time) + "[sec]")
 
-            measure_start_time = time.time()
-            cv2.imshow('BodyTemperatureDetection_Finish', img)
-            elapsed_time = time.time() - measure_start_time
-            print ("5(imshow):{0}".format(elapsed_time) + "[sec]")
+            # OpenCVの画像をPygame用に変換
+            pygame_image = convert_opencv_img_to_pygame(result_frame)
+
+            # カメラ表示
+            screen.blit(pygame_image, (0, 0))
+
+            # サーモ表示 ##########################################################################
+            thermo_offset_x = 0
+            thermo_offset_y = 480 - 160
+
+            for ix, row in enumerate(sensor_pixels):
+                for jx, pixel in enumerate(row):
+                    pygame.draw.rect(screen, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
+            # サーモ表示 ##########################################################################
+
+            # 文字表示(最高温度、測定結果) #############################
+            pygame.font.init()
+
+            font1 = pygame.font.SysFont("notosansmonocjkjp", 15, bold=True, italic=False)
+            text1 = font1.render(MaxTempStr, True, TextColor, background_color)
+
+            font2 = pygame.font.SysFont("notosansmonocjkjp", 15, bold=True, italic=False)
+            text2 = font2.render(DetectResult, True, TextColor, background_color)
+
+            screen.blit(text1, (0,260))
+            screen.blit(text2, (0,290))
+            # 文字表示 #############################        
+
+            # 画面を更新
+            pygame.display.update()
+
+            #measure_start_time = time.time()
+            #cv2.imshow('BodyTemperatureDetection_Finish', img)
+            #elapsed_time = time.time() - measure_start_time
+            #print ("5(imshow):{0}".format(elapsed_time) + "[sec]")
         
         # キュー入力判定
         # "q"でループから抜ける
