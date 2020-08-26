@@ -2,6 +2,8 @@
 
 import cv2
 #print(cv2.__version__) 
+import configparser
+
 import Camera
 import Sensor
 import Monitor_Pygame_blit_test
@@ -27,6 +29,14 @@ DETECT_TH = 37.5
 
 def main():
     # iniファイル読み込み
+    ini = configparser.ConfigParser()
+
+    try:
+        ini.read('./config.ini')
+        print(ini['CAMERA']['FPS'])
+
+    except:
+        print("iniファイルの読み込みに失敗しました。")
 
 
     # カメラ接続確認
