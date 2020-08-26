@@ -5,9 +5,6 @@ import sys
 import logging
 import time
 
-import busio
-import board
-
 from Adafruit_AMG88xx import Adafruit_AMG88xx
 
 ##################################################################
@@ -32,7 +29,7 @@ isfever = False     # 発熱有無(True:発熱あり/False:発熱なし)
 
 ##################################################################
 def set_sensor_parameter(sensor_connected, wait_time, detect_start_temperature, detect_continue_framenum, fever_temperature):
-    """センサで必要なパラメータを設
+    """センサで必要なパラメータを設定
 
     :param sensor_connected: センサ接続有無
     :param wait_time: センサ安定待ち時間
@@ -59,16 +56,17 @@ def set_sensor_parameter(sensor_connected, wait_time, detect_start_temperature, 
 
 ##################################################################
 def sensor_connect_check():
-    """センサの接続確認"""
+    """センサの接続確認
+
+    :return センサの接続結果(True:接続成功/False:接続失敗)
+    """
 
     print("[" + os.path.basename(__file__) + "]" + sys._getframe().f_code.co_name)
 
     if SENSOR_CONNECTED == 1:
-        # I2Cバスの初期化
-        i2c_bus = busio.I2C(board.SCL, board.SDA)
         # センサーの初期化
         global sensor
-        sensor = Adafruit_AMG88xx(addr=0x68)
+        sensor = Adafruit_AMG88xx()
         # センサーの初期化待ち
         time.sleep(.1)
         result = True
