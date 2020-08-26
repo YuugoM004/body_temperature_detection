@@ -135,10 +135,9 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     #create the array of colors
     colors = [(int(c.red * 255), int(c.green * 255), int(c.blue * 255)) for c in colors]
 
-    #displayPixelHeight = 160 / 8
-    #displayPixelWidth = 160 / 8
-    displayPixelHeight = 8
-    displayPixelWidth = 8
+    # センサからの32x32配列データを160x160で表示する
+    displayPixelHeight = 160 / 32
+    displayPixelWidth = 160 / 32
 
     lcd = pygame.display.set_mode((width, height))
 
@@ -324,8 +323,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
             # サーモ表示 ##########################################################################
             thermo_offset_x = 0
-            #thermo_offset_y = 480 - 160
-            thermo_offset_y = 0
+            thermo_offset_y = 480 - 160
 
             for ix, row in enumerate(bicubic):
                 for jx, pixel in enumerate(row):
