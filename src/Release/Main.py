@@ -33,7 +33,13 @@ def main():
 
     try:
         ini.read('./config.ini')
-        print(ini['CAMERA']['FPS'])
+
+        # カメラにiniファイルの内容を設定
+        Camera.set_camera_parameter(int(ini['CAMERA']['DEVICE_ID']), \
+                                    int(ini['CAMERA']['WIDTH']), \
+                                    int(ini['CAMERA']['HEIGHT']), \
+                                    int(ini['CAMERA']['FPS'])
+                                    )
 
         # センサにiniファイルの内容を設定
         Sensor.set_sensor_parameter(int(ini['SENSOR']['SENSOR_CONNECTED']), \
@@ -48,7 +54,7 @@ def main():
 
 
     # カメラ接続確認
-    if(Camera.CameraConnectCheck(DEVICE_ID) == 1):
+    if(Camera.CameraConnectCheck() == 1):
         STATUS = "WAIT"
     else:
     # メッセージを表示(メッセージボックスとか)
@@ -64,7 +70,7 @@ def main():
     try:
         while True:
             # カメラ制御
-            cap = Camera.Camera_Func(DEVICE_ID, WIDTH, HEIGHT, FPS)
+            cap = Camera.Camera_Func()
 
             # センサ制御
             #sensor_pixels, max_temp, STATUS = Sensor.Sensor_Func(DETECT_START_END_TH)

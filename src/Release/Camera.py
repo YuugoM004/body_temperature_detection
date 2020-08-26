@@ -3,7 +3,33 @@
 import cv2
 #print(cv2.__version__) 
 
-def CameraConnectCheck(DEVICE_ID):
+##################################################################
+# デフォルト(iniファイルからの読み込みで上書き)
+# デバイスID
+DEVICE_ID = 0
+# ウインドウの幅
+WIDTH = 640
+# ウインドウの高さ
+HEIGHT = 480
+ # フレームレート
+FPS = 10
+
+
+def set_camera_parameter(device_id, width, height, fps):
+
+    global DEVICE_ID
+    DEVICE_ID = device_id
+
+    global WIDTH
+    WIDTH = width
+
+    global HEIGHT
+    HEIGHT = height
+
+    global FPS
+    FPS = fps
+
+def CameraConnectCheck():
     print ("### CameraConnectCheck ###")
 
     # デバイスのオープン
@@ -18,13 +44,9 @@ def CameraConnectCheck(DEVICE_ID):
         print ("カメラ読み込み失敗")
         return 0
 
-#########################################################################################
-def decode_fourcc(v):
-    v = int(v)
-    return "".join([chr((v >> 8 * i) & 0xFF) for i in range(4)])
 
 #########################################################################################
-def Camera_Func(DEVICE_ID, WIDTH, HEIGHT, FPS):
+def Camera_Func():
 
     print ("### Camera_Func ###")
 
@@ -35,12 +57,5 @@ def Camera_Func(DEVICE_ID, WIDTH, HEIGHT, FPS):
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
     cap.set(cv2.CAP_PROP_FPS, FPS)
-
-    # フォーマット・解像度・FPSの取得
-    fourcc = decode_fourcc(cap.get(cv2.CAP_PROP_FOURCC))
-    width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-    height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    print ("fourcc:{} fps:{} width:{} height:{}" .format(fourcc, fps, width, height))
 
     return cap
