@@ -35,6 +35,14 @@ def main():
         ini.read('./config.ini')
         print(ini['CAMERA']['FPS'])
 
+        # センサにiniファイルの内容を設定
+        Sensor.set_sensor_parameter(int(ini['SENSOR']['SENSOR_CONNECTED']), \
+                                    int(ini['SENSOR']['WAIT_TIME']), \
+                                    int(ini['SENSOR']['DETECT_START_TEMPERATURE']), \
+                                    int(ini['SENSOR']['DETECT_CONTINUE_FRAMENUM']), \
+                                    int(ini['SENSOR']['FEVER_TEMPERATURE'])
+                                    )
+
     except:
         print("iniファイルの読み込みに失敗しました。")
 
@@ -47,7 +55,10 @@ def main():
         print ("カメラの接続に失敗しました")
         exit()
 
-    # センサ接続確認
+    # センサ初期化
+    if Sensor.initialize_sensor() == False:
+        print ("センサの接続に失敗しました")
+        exit()
 
 
     try:
@@ -56,12 +67,12 @@ def main():
             cap = Camera.Camera_Func(DEVICE_ID, WIDTH, HEIGHT, FPS)
 
             # センサ制御
-            sensor_pixels, max_temp, STATUS = Sensor.Sensor_Func(DETECT_START_END_TH)
-            print ("STATUS:" + STATUS)
-            print ("最高温度:" + str(max_temp))
+            #sensor_pixels, max_temp, STATUS = Sensor.Sensor_Func(DETECT_START_END_TH)
+            #print ("STATUS:" + STATUS)
+            #print ("最高温度:" + str(max_temp))
 
             # モニタ制御
-            Monitor_Pygame_blit_test.Monitor_Func(cap, WIDTH, HEIGHT, max_temp, STATUS, DETECT_TH, sensor_pixels)
+            Monitor_Pygame_blit_test.Monitor_Func(cap, WIDTH, HEIGHT, 0, "WAIT", 0, [])
 
     # 終了処理
     # "Ctrl+C"でループから抜ける
