@@ -102,6 +102,9 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     print ("### Monitor_Func ###")
     print ("STATUS:" + STATUS)
 
+    # 全画面設定フラグ
+    fullscreen_flag = True
+
     ######################  Pygameお試し ############################
     # Pygameお試し
     # センサ初期化、サイズ設定など
@@ -115,7 +118,6 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     COLORDEPTH = 1024
 
     os.putenv('SDL_FBDEV', '/dev/fb1')
-    pygame.init()
 
     #initialize the sensor
     #sensor = Adafruit_AMG88xx()
@@ -141,13 +143,23 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     displayPixelHeight = 160 / 32
     displayPixelWidth = 160 / 32
 
+    # Pygameを初期化
+    pygame.init()
+
+    SCR_RECT = Rect(0, 0, 640, 480)
+    lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
+
+    # スプライトグループを作成してスプライトクラスに割り当て
+    group = pygame.sprite.RenderUpdates()
+    MySprite.containers = group
+
     # 最終的に描画したいサイズでdisplaySurface作成
-    final_display_size_h = 1920
-    final_display_size_v = 1200
-    pygame.display.set_mode((final_display_size_h, final_display_size_v))
+    #final_display_size_h = 1920
+    #final_display_size_v = 1200
+    #pygame.display.set_mode((final_display_size_h, final_display_size_v))
 
     # 動かしたいサイズで別のSurface作成
-    lcd = pygame.Surface((width, height))
+    #lcd = pygame.Surface((width, height))
     #lcd = pygame.display.set_mode((width, height))
 
     # 全画面表示
@@ -351,10 +363,37 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             # 文字表示 #############################
 
             # 描画していたSurfaceを拡大し、その描画先をdisplaySurfaceにする
-            pygame.transform.scale(lcd, (final_display_size_h, final_display_size_v), pygame.display.get_surface())
+            #pygame.transform.scale(lcd, (final_display_size_h, final_display_size_v), pygame.display.get_surface())
+
+           # スプライトグループを更新
+            group.update()
+
+            # スプライトグループを描画
+            group.draw(lcd)
 
             # 画面を更新
             pygame.display.update()
+
+            for event in pygame.event.get():
+                print("### event loop ###")
+                print(event.type)
+
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == KEYDOWN and event.key == K_F2:
+                    print("F2押下！！！！！")
+
+                    # F2キーでフルスクリーンモードへの切り替え
+                    fullscreen_flag = not fullscreen_flag
+                    print("fullscreen_flag: " + str(fullscreen_flag))
+
+                    if fullscreen_flag:
+                        print("フルスクリーン")
+                        lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
+                    else:
+                        print("通常スクリーン")
+                        lcd = pygame.display.set_mode(SCR_RECT.size)
 
             #measure_start_time = time.time()
             #cv2.imshow('BodyTemperatureDetection_Finish', img)
