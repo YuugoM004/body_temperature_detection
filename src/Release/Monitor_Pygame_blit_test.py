@@ -139,7 +139,14 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     displayPixelHeight = 160 / 32
     displayPixelWidth = 160 / 32
 
-    lcd = pygame.display.set_mode((width, height))
+    # 最終的に描画したいサイズでdisplaySurface作成
+    final_display_size_h = 1920
+    final_display_size_v = 1200
+    pygame.display.set_mode((final_display_size_h, final_display_size_v))
+
+    # 動かしたいサイズで別のSurface作成
+    lcd = pygame.Surface((width, height))
+    #lcd = pygame.display.set_mode((width, height))
 
     # 全画面表示
     #lcd = pygame.display.set_mode((0,0))
@@ -330,6 +337,9 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
                     pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
             # サーモ表示 ##########################################################################
 
+            # 顔枠を表示
+            pygame.draw.rect(lcd, (0, 0, 255), (220, 140, 200, 200), 3)
+
             # 文字表示(最高温度、測定結果) #############################
             pygame.font.init()
 
@@ -343,8 +353,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             lcd.blit(text2, (0,290))
             # 文字表示 #############################
 
-            # 顔枠を表示
-            pygame.draw.rect(lcd, (0, 0, 255), (220, 140, 200, 200), 3)
+            # 描画していたSurfaceを拡大し、その描画先をdisplaySurfaceにする
+            pygame.transform.scale(lcd, (final_display_size_h, final_display_size_v), pygame.display.get_surface())
 
             # 画面を更新
             pygame.display.update()
