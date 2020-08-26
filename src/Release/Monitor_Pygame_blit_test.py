@@ -14,6 +14,8 @@ import itertools
 
 import Sensor
 
+from pygame.locals import *
+
 ######################  Pygameお試し ############################
 from Adafruit_AMG88xx import Adafruit_AMG88xx
 import pygame
@@ -40,6 +42,11 @@ def convert_opencv_img_to_pygame(opencv_image):
     pygame_image = pygame.image.frombuffer(opencv_image.tostring(), shape, 'RGB')
 
     return pygame_image
+
+class MySprite(pygame.sprite.Sprite):
+    def __init__(self, filename, x, y, vx, vy):
+        # デフォルトグループをセット
+        pygame.sprite.Sprite.__init__(self, self.containers)
 
 ######################  Pygameお試し ############################
 
