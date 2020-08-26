@@ -164,6 +164,16 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
     plt.figure(figsize=(1, 1), dpi=160)
 
+    ### 状態判定お試し(最終的にはSensor.pyでやる)
+    state = "WAIT"
+    detect_start_temperature = 35
+    detect_continue_framenum = 15
+    fever_temperature = 37.5
+    frame_counter = 0
+    max_temp = 0
+    isfever = False
+    ### ここまで
+
     while True:
 
         # カメラ画像取得
@@ -191,8 +201,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
         pixels = sensor.readPixels()
         pixels = list(map(lambda x: x + 5.0 if x >= 30.0 else x, pixels))
         print (pixels)
-        max_temp = max(pixels)
-        print ("センサ最高温度:" + str(max_temp))
+        detect_max_temperature = max(pixels)
+        print ("センサ最高温度:" + str(detect_max_temperature))
         elapsed_time = time.time() - measure_start_time
         print ("GetSensorData & ChooseMaxTemp:{0}".format(elapsed_time) + "[sec]")
 
@@ -210,11 +220,61 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
         #
         #pygame.display.update()
 
+        ### 状態判定お試し(最終的にはSensor.pyでやる)
+        if state == "WAIT":
+            if detect_max_temperature >= detect_start_temperature:
+                frame_counter = frame_counter + 1
+
+                if frame_counter >= 15:  # TODO:何フレームにするか要調整
+                    frame_counter = 0
+                    state = "DETECT"    # WAIT->DETECT
+
+            else:
+                # 閾値以下になったらカウンタリセット
+                frame_counter = 0
+
+        elif state == "DETECT":
+            if detect_max_temperature >= detect_start_temperature:
+                frame_counter = frame_counter + 1
+
+                # 最高温度を保持
+                if detect_max_temperature > max_temp:
+                    max_temp = detect_max_temperature
+
+                if frame_counter >= detect_continue_framenum:
+                    # 発熱判定
+                    if max_temp >= fever_temperature:
+                        isfever = True
+                    else:
+                        isfever = False
+
+                    frame_counter = 0
+                    state = "FINISH"    # DETECT->FINISH
+
+            else:
+                # 閾値以下になったらWAIT状態に戻る
+                max_temp = 0
+                frame_counter = 0
+                state = "WAIT" # DETECT->WAIT
+
+        elif state == "FINISH":
+            if detect_max_temperature < detect_start_temperature:
+                max_temp = 0
+                isfever = False
+                state = "WAIT" # FINISH->WAIT
+
+        else:
+            # 予期しない状態->諸々初期状態に戻してWAITにする
+            frame_counter = 0
+            max_temp = 0
+            isfever = False
+            state = "WAIT"
+        ### ここまで
 
         ######################  Pygameお試し ############################
 
-        if(STATUS == "WAIT"):
-            print ("STATUS:" + STATUS)
+        if(state == "WAIT"):
+            print ("state:" + state + str(frame_counter))
         
             # カメラ画像とサーモグラフィー表示
             #result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
@@ -243,8 +303,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
              # ウインドウ表示位置指定
             #cv2.moveWindow("BodyTemperatureDetection", window_display_pos_x,window_display_pos_y)
 
-        if(STATUS == "DETECT"):
-            print ("STATUS:" + STATUS)
+        if(state == "DETECT"):
+            print ("state:" + state + str(frame_counter))
 
             # カメラ画像とサーモグラフィー表示
             result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
@@ -263,8 +323,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             img = np.array(img_pil)
             cv2.imshow('BodyTemperatureDetection_Text_Detect', img)
 
-        if(STATUS == "FINISH"):
-            print ("STATUS:" + STATUS)
+        if(state == "FINISH"):
+            print ("state:" + state)
 
             # カメラ画像とサーモグラフィー表示
             measure_start_time = time.time()
@@ -282,7 +342,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
             # 温度によって、表示するテキストの色を変える
             background_color = (0, 0, 0)
-            if(max_temp >= DETECT_TH):
+            if(isfever == True):
                 #TextColor = (0, 0, 255)         # 赤
                 TextColor = (255, 0, 0)         # 赤
                 DetectResult = "正確な検温を行ってください。"
