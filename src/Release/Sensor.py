@@ -138,65 +138,69 @@ def measurement_temperature_and_status():
     detect_max_temperature = max(temperature_array)
     print ("センサ最高温度:" + str(detect_max_temperature))
 
-    # 状態を判定
-    # WAIT->DETECT   : 最高温度が[DETECT_START_TEMPERATURE]を連続で[DETECT_START_FRAMENUM]フレーム超える
-    # DETECT->FINISH : DETECT状態になってから最高温度が[DETECT_START_TEMPERATURE]を連続で[DETECT_CONTINUE_FRAMENUM]フレーム超える
-    # DETECT->WAIT   : DETECT状態になってからFINISH条件になる前に最高温度が[DETECT_START_TEMPERATURE]以下になる
-    # FINISH->WAIT   : 最高温度が[DETECT_START_TEMPERATURE]以下になる
-    global state
-    global isfever
-    global max_temperature
-    global frame_counter
-    if state == "WAIT":
-        if detect_max_temperature >= DETECT_START_TEMPERATURE:
-            frame_counter = frame_counter + 1
+    def judge_state():
+        """状態を判定"""
 
-            if frame_counter >= DETECT_START_FRAMENUM:
+        # WAIT->DETECT   : 最高温度が[DETECT_START_TEMPERATURE]を連続で[DETECT_START_FRAMENUM]フレーム超える
+        # DETECT->FINISH : DETECT状態になってから最高温度が[DETECT_START_TEMPERATURE]を連続で[DETECT_CONTINUE_FRAMENUM]フレーム超える
+        # DETECT->WAIT   : DETECT状態になってからFINISH条件になる前に最高温度が[DETECT_START_TEMPERATURE]以下になる
+        # FINISH->WAIT   : 最高温度が[DETECT_START_TEMPERATURE]以下になる
+        global state
+        global isfever
+        global max_temperature
+        global frame_counter
+        if state == "WAIT":
+            if detect_max_temperature >= DETECT_START_TEMPERATURE:
+                frame_counter = frame_counter + 1
+
+                if frame_counter >= DETECT_START_FRAMENUM:
+                    frame_counter = 0
+                    state = "DETECT"    # WAIT->DETECT
+
+            else:
+                # 閾値以下になったらカウンタリセット
                 frame_counter = 0
-                state = "DETECT"    # WAIT->DETECT
+
+        elif state == "DETECT":
+            if detect_max_temperature >= DETECT_START_TEMPERATURE:
+                frame_counter = frame_counter + 1
+
+                # 最高温度を保持
+                if detect_max_temperature > max_temperature:
+                    max_temperature = detect_max_temperature
+
+                if frame_counter >= DETECT_CONTINUE_FRAMENUM:
+                    # 発熱判定
+                    if max_temperature >= FEVER_TEMPERATURE:
+                        isfever = True
+                    else:
+                        isfever = False
+
+                    frame_counter = 0
+                    state = "FINISH"    # DETECT->FINISH
+
+            else:
+                # 閾値以下になったらWAIT状態に戻る
+                max_temperature = 0
+                frame_counter = 0
+                state = "WAIT" # DETECT->WAIT
+
+        elif state == "FINISH":
+            if detect_max_temperature < DETECT_START_TEMPERATURE:
+                max_temperature = 0
+                isfever = False
+                state = "WAIT" # FINISH->WAIT
 
         else:
-            # 閾値以下になったらカウンタリセット
+            # 予期しない状態->諸々初期状態に戻してWAITにする
             frame_counter = 0
-
-    elif state == "DETECT":
-        if detect_max_temperature >= DETECT_START_TEMPERATURE:
-            frame_counter = frame_counter + 1
-
-            # 最高温度を保持
-            if detect_max_temperature > max_temperature:
-                max_temperature = detect_max_temperature
-
-            if frame_counter >= DETECT_CONTINUE_FRAMENUM:
-                # 発熱判定
-                if max_temperature >= FEVER_TEMPERATURE:
-                    isfever = True
-                else:
-                    isfever = False
-
-                frame_counter = 0
-                state = "FINISH"    # DETECT->FINISH
-
-        else:
-            # 閾値以下になったらWAIT状態に戻る
-            max_temperature = 0
-            frame_counter = 0
-            state = "WAIT" # DETECT->WAIT
-
-    elif state == "FINISH":
-        if detect_max_temperature < DETECT_START_TEMPERATURE:
             max_temperature = 0
             isfever = False
-            state = "WAIT" # FINISH->WAIT
+            state = "WAIT"
 
-    else:
-        # 予期しない状態->諸々初期状態に戻してWAITにする
-        frame_counter = 0
-        max_temperature = 0
-        isfever = False
-        state = "WAIT"
+        print ("state:" + state + str(frame_counter))
 
-    print ("state:" + state + str(frame_counter))
+    judge_state()
 
 
 ##################################################################
