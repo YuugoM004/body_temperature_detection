@@ -15,6 +15,7 @@ import itertools
 import Sensor
 
 from pygame.locals import *
+from itertools import cycle
 
 ######################  Pygameお試し ############################
 from Adafruit_AMG88xx import Adafruit_AMG88xx
@@ -254,6 +255,14 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     SCR_RECT = Rect(0, 0, 640, 480)
     lcd = pygame.display.set_mode(SCR_RECT.size, pygame.FULLSCREEN)
 
+    #lcd_rect = lcd.get_rect()
+    clock = pygame.time.Clock()
+
+    BLINK_EVENT = pygame.USEREVENT + 0
+
+    #pygame.time.set_timer(BLINK_EVENT, 1000)
+    pygame.time.set_timer(BLINK_EVENT, 250)
+
     # スプライトグループを作成してスプライトクラスに割り当て
     group = pygame.sprite.RenderUpdates()
     MySprite.containers = group
@@ -322,8 +331,23 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             Message = "測定中"
 
             font = pygame.font.SysFont("notosansmonocjkjp", 20, bold=True, italic=False)
-            text = font.render(Message, True, TextColor, background_color)
-            lcd.blit(text, (0,280))
+            #text = font.render(Message, True, TextColor, background_color)
+            on_text = font.render(Message, True, TextColor, background_color)
+            blink_rect = on_text.get_rect()
+            #blink_rect.center = lcd_rect.center
+
+            off_text = pygame.Surface(blink_rect.size)
+            blink_surfaces = cycle([on_text, off_text])
+            blink_surface = next(blink_surfaces)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
+                if event.type == BLINK_EVENT:
+                    print("### BLINK_EVENT ###")
+                    blink_surface = next(blink_surfaces)
+
+            lcd.blit(blink_surface, (0,280))
             # 文字表示 #############################
 
             # スプライトグループを更新
@@ -332,6 +356,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             group.draw(lcd)
             # 画面を更新
             pygame.display.update()
+
+            clock.tick(60)
 
         if(state == "FINISH"):
             # カメラ画像とサーモグラフィーを表示
