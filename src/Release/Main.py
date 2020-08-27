@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import cv2
+#import cv2
 import pygame
 #print(cv2.__version__) 
 import configparser
@@ -75,14 +75,13 @@ def main():
 
     camera_connect_check_result = Camera.camera_connect_check()
     sensor_connect_check_result = Sensor.initialize_sensor()
-    # 初期化画面を表示
+    # 初期化画面(接続確認結果)を表示
     Monitor_Pygame_blit_test.display_initialize_checked(camera_connect_check_result, sensor_connect_check_result)
     time.sleep(2)           # 表示がすぐ切り替わるので少し表示させておく
+
     if((camera_connect_check_result == False) or (sensor_connect_check_result == False)):
-        time.sleep(3)       # 表示がすぐ切り替わるので少し表示させておく
-        # ユーザー向けには画面はずっと表示したままの方が良さそう
-        # exitするとターミナルが見えるので
-        exit()
+        # 電源OFF画面を表示
+        Monitor_Pygame_blit_test.display_turnoff()
 
     try:
         while True:

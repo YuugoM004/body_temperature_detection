@@ -107,17 +107,68 @@ def display_initialize_checked(camera_connect_check_result, sensor_connect_check
     lcd.blit(text1, (180,200))
     lcd.blit(text2, (180,230))
     
-    if((camera_connect_check_result == False) or (sensor_connect_check_result == False)):
-        reboot_text = "電源OFF後、接続を確認して再度電源ONしてください"
-                
-        font3 = pygame.font.SysFont("notosansmonocjkjp", 20, bold=True, italic=False)
-        text3 = font3.render(reboot_text, True, TextColor)
-
-        lcd.blit(text3, (80,270))
-    # 文字表示 #############################
-
     # 画面を更新
     pygame.display.update()
+
+#####################################################################################################
+def display_turnoff():
+    print("display_turnoff")
+
+    # 全画面設定フラグ
+    fullscreen_flag = True
+
+    # Pygameを初期化
+    pygame.init()
+
+    SCR_RECT = Rect(0, 0, 640, 480)
+    lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
+    
+    # スプライトグループを作成してスプライトクラスに割り当て
+    group = pygame.sprite.RenderUpdates()
+    MySprite.containers = group
+
+    lcd.fill((0,0,0))                   # 黒
+    pygame.display.update()
+
+    while True:
+
+        # 文字を表示(文字表示) ################
+        pygame.font.init()
+        TextColor = (255, 255, 255)         # 白
+
+        reboot_text = "電源OFF後、接続を確認して再度電源ONしてください"
+                
+        #font3 = pygame.font.SysFont("notosansmonocjkjp", 20, bold=True, italic=False)
+        font3 = pygame.font.SysFont("notosansmonocjkjp", 20, bold=False, italic=False)
+        text3 = font3.render(reboot_text, True, TextColor)
+
+        #lcd.blit(text3, (80,270))
+        lcd.blit(text3, (80,200))
+        # 文字表示 #############################
+
+        # 画面を更新
+        pygame.display.update()
+
+        # 通常画面と全画面表示の切り替え
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN and event.key == K_F2:
+                # F2キーで通常画面と全画面の切り替え
+                fullscreen_flag = not fullscreen_flag
+                print("fullscreen_flag: " + str(fullscreen_flag))
+
+                if fullscreen_flag:
+                    print("フルスクリーン")
+                    pygame.display.quit()
+                    pygame.display.init()
+                    lcd = pygame.display.set_mode(SCR_RECT.size, pygame.FULLSCREEN)
+                else:
+                    print("通常スクリーン")
+                    pygame.display.quit()
+                    pygame.display.init()
+                    lcd = pygame.display.set_mode(SCR_RECT.size, pygame.RESIZABLE)
 
 #####################################################################################################
 # カメラ画像とサーモグラフィーを表示
@@ -146,7 +197,7 @@ def display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPT
     # サーモ表示 ##########################################################################
 
     # 顔枠を表示
-    pygame.draw.rect(lcd, (0, 0, 255), (220, 140, 200, 200), 3)
+    #pygame.draw.rect(lcd, (0, 0, 255), (220, 140, 200, 200), 3)
     pygame.draw.rect(lcd, (0, 0, 255), (220, 90, 200, 300), 3)
 
 #####################################################################################################
@@ -320,15 +371,10 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
         #############################################################################
         # 通常画面と全画面表示の切り替え
         for event in pygame.event.get():
-            print("### event loop ###")
-            print(event.type)
-
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_F2:
-                print("F2押下！！！！！")
-
                 # F2キーで通常画面と全画面の切り替え
                 fullscreen_flag = not fullscreen_flag
                 print("fullscreen_flag: " + str(fullscreen_flag))
