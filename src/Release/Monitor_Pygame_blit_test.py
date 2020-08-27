@@ -261,7 +261,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     BLINK_EVENT = pygame.USEREVENT + 0
 
     #pygame.time.set_timer(BLINK_EVENT, 1000)
-    pygame.time.set_timer(BLINK_EVENT, 250)
+    pygame.time.set_timer(BLINK_EVENT, 500)
 
     # スプライトグループを作成してスプライトクラスに割り当て
     group = pygame.sprite.RenderUpdates()
