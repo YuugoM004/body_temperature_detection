@@ -36,24 +36,24 @@ def main():
 
     try:
         ini.read('./config.ini')
-
-        # カメラにiniファイルの内容を設定
-        Camera.set_camera_parameter(int(ini['CAMERA']['DEVICE_ID']), \
-                                    int(ini['CAMERA']['WIDTH']), \
-                                    int(ini['CAMERA']['HEIGHT']), \
-                                    int(ini['CAMERA']['FPS'])
-                                    )
-
-        # センサにiniファイルの内容を設定
-        Sensor.set_sensor_parameter(int(ini['SENSOR']['SENSOR_CONNECTED']), \
-                                    int(ini['SENSOR']['WAIT_TIME']), \
-                                    int(ini['SENSOR']['DETECT_START_TEMPERATURE']), \
-                                    int(ini['SENSOR']['DETECT_CONTINUE_FRAMENUM']), \
-                                    int(ini['SENSOR']['FEVER_TEMPERATURE'])
-                                    )
-
     except:
         print("iniファイルの読み込みに失敗しました。")
+
+    # カメラにiniファイルの内容を設定
+    Camera.set_camera_parameter(int(ini['CAMERA']['DEVICE_ID']), \
+                                int(ini['CAMERA']['WIDTH']), \
+                                int(ini['CAMERA']['HEIGHT']), \
+                                int(ini['CAMERA']['FPS'])
+                                )
+
+    # センサにiniファイルの内容を設定
+    Sensor.set_sensor_parameter(int(ini['SENSOR']['SENSOR_CONNECTED']), \
+                                int(ini['SENSOR']['WAIT_TIME']), \
+                                float(ini['SENSOR']['CORRECTION_VALUE']), \
+                                float(ini['SENSOR']['DETECT_START_TEMPERATURE']), \
+                                int(ini['SENSOR']['DETECT_CONTINUE_FRAMENUM']), \
+                                float(ini['SENSOR']['FEVER_TEMPERATURE'])
+                                )
 
     # 初期化画面を表示
     Monitor_Pygame_blit_test.display_initialize_cheking()

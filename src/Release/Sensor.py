@@ -11,6 +11,7 @@ from Adafruit_AMG88xx import Adafruit_AMG88xx
 # 定数(iniファイルからの読み込み)
 SENSOR_CONNECTED = 1
 WAIT_TIME = 0
+CORRECTION_VALUE = 0
 DETECT_START_TEMPERATURE = 0
 DETECT_CONTINUE_FRAMENUM = 0
 FEVER_TEMPERATURE = 0
@@ -28,11 +29,12 @@ isfever = False     # 発熱有無(True:発熱あり/False:発熱なし)
 
 
 ##################################################################
-def set_sensor_parameter(sensor_connected, wait_time, detect_start_temperature, detect_continue_framenum, fever_temperature):
+def set_sensor_parameter(sensor_connected, wait_time, correction_value, detect_start_temperature, detect_continue_framenum, fever_temperature):
     """センサで必要なパラメータを設定
 
     :param sensor_connected: センサ接続有無
     :param wait_time: センサ安定待ち時間
+    :param correction_value: センサ補正値
     :param detect_start_temperature: 計測開始温度閾値
     :param detect_continue_framenum: 計測継続フレーム数
     :param fever_temperature: 発熱検知閾値
@@ -43,6 +45,9 @@ def set_sensor_parameter(sensor_connected, wait_time, detect_start_temperature, 
 
     global WAIT_TIME
     WAIT_TIME = wait_time
+
+    global CORRECTION_VALUE
+    CORRECTION_VALUE = correction_value
 
     global DETECT_START_TEMPERATURE
     DETECT_START_TEMPERATURE = detect_start_temperature
@@ -121,8 +126,8 @@ def measurement_temperature_and_status():
     print (temperature_array)
 
     # センサ出力値の補正
-    # 30℃以上のところに5℃のゲタを履かせる
-    temperature_array = list(map(lambda x: x + 5.0 if x >= 30.0 else x, temperature_array))     # TODO:補正値は引数でもらうようにした方がいいかも(iniファイル)
+    # 30℃以上のところにゲタを履かせる
+    temperature_array = list(map(lambda x: x + CORRECTION_VALUE if x >= 30.0 else x, temperature_array))
 
     # 最高温度を計算
     detect_max_temperature = max(temperature_array)
