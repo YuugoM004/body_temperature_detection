@@ -16,6 +16,10 @@ FPS = 10
 
 
 def set_camera_parameter(device_id, width, height, fps):
+    """iniから読み込んだ値をカメラパラメータにセット
+
+    :return なし
+    """
 
     global DEVICE_ID
     DEVICE_ID = device_id
@@ -29,8 +33,11 @@ def set_camera_parameter(device_id, width, height, fps):
     global FPS
     FPS = fps
 
-def CameraConnectCheck():
-    print ("### CameraConnectCheck ###")
+def camera_connect_check():
+    """カメラの接続確認
+
+    :return カメラの接続結果(True:接続成功/False:接続失敗)
+    """
 
     # デバイスのオープン
     cap = cv2.VideoCapture(DEVICE_ID)
@@ -46,9 +53,11 @@ def CameraConnectCheck():
 
 
 #########################################################################################
-def Camera_Func():
+def get_camera_capture():
+    """カメラ画像のキャプチャ
 
-    print ("### Camera_Func ###")
+    :return カメラで取得した画像(cv2.VideoCapture)
+    """
 
     cap = cv2.VideoCapture(DEVICE_ID)
 

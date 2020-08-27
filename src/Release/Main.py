@@ -60,7 +60,7 @@ def main():
     time.sleep(1)       # 表示がすぐ切り替わるので少し表示させておく
 
     # カメラ接続確認
-    if(Camera.CameraConnectCheck()):
+    if(Camera.camera_connect_check()):
         STATUS = "WAIT"
     else:
     # メッセージを表示(メッセージボックスとか)
@@ -73,7 +73,7 @@ def main():
         #exit()
 
 
-    camera_connect_check_result = Camera.CameraConnectCheck()
+    camera_connect_check_result = Camera.camera_connect_check()
     sensor_connect_check_result = Sensor.initialize_sensor()
     # 初期化画面を表示
     Monitor_Pygame_blit_test.display_initialize_checked(camera_connect_check_result, sensor_connect_check_result)
@@ -87,7 +87,7 @@ def main():
     try:
         while True:
             # カメラ制御
-            cap = Camera.Camera_Func()
+            cap = Camera.get_camera_capture()
 
             # センサ制御
             #sensor_pixels, max_temp, STATUS = Sensor.Sensor_Func(DETECT_START_END_TH)
