@@ -51,6 +51,7 @@ def main():
                                 int(ini['SENSOR']['WAIT_TIME']), \
                                 float(ini['SENSOR']['CORRECTION_VALUE']), \
                                 float(ini['SENSOR']['DETECT_START_TEMPERATURE']), \
+                                int(ini['SENSOR']['DETECT_START_FRAMENUM']), \
                                 int(ini['SENSOR']['DETECT_CONTINUE_FRAMENUM']), \
                                 float(ini['SENSOR']['FEVER_TEMPERATURE'])
                                 )

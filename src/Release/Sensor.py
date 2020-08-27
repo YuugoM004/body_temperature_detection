@@ -13,6 +13,7 @@ SENSOR_CONNECTED = 1
 WAIT_TIME = 0
 CORRECTION_VALUE = 0
 DETECT_START_TEMPERATURE = 0
+DETECT_START_FRAMENUM = 0
 DETECT_CONTINUE_FRAMENUM = 0
 FEVER_TEMPERATURE = 0
 
@@ -29,13 +30,14 @@ isfever = False     # 発熱有無(True:発熱あり/False:発熱なし)
 
 
 ##################################################################
-def set_sensor_parameter(sensor_connected, wait_time, correction_value, detect_start_temperature, detect_continue_framenum, fever_temperature):
+def set_sensor_parameter(sensor_connected, wait_time, correction_value, detect_start_temperature, detect_start_framenum, detect_continue_framenum, fever_temperature):
     """センサで必要なパラメータを設定
 
     :param sensor_connected: センサ接続有無
     :param wait_time: センサ安定待ち時間
     :param correction_value: センサ補正値
     :param detect_start_temperature: 計測開始温度閾値
+    :param detect_start_framenum: 計測開始温度閾値オーバー継続フレーム数
     :param detect_continue_framenum: 計測継続フレーム数
     :param fever_temperature: 発熱検知閾値
     """
@@ -51,6 +53,9 @@ def set_sensor_parameter(sensor_connected, wait_time, correction_value, detect_s
 
     global DETECT_START_TEMPERATURE
     DETECT_START_TEMPERATURE = detect_start_temperature
+
+    global DETECT_START_FRAMENUM
+    DETECT_START_FRAMENUM = detect_start_framenum
 
     global DETECT_CONTINUE_FRAMENUM
     DETECT_CONTINUE_FRAMENUM = detect_continue_framenum
@@ -134,7 +139,7 @@ def measurement_temperature_and_status():
     print ("センサ最高温度:" + str(detect_max_temperature))
 
     # 状態を判定
-    # WAIT->DETECT   : 最高温度が[DETECT_START_TEMPERATURE]を連続で20フレーム超える
+    # WAIT->DETECT   : 最高温度が[DETECT_START_TEMPERATURE]を連続で[DETECT_START_FRAMENUM]フレーム超える
     # DETECT->FINISH : DETECT状態になってから最高温度が[DETECT_START_TEMPERATURE]を連続で[DETECT_CONTINUE_FRAMENUM]フレーム超える
     # DETECT->WAIT   : DETECT状態になってからFINISH条件になる前に最高温度が[DETECT_START_TEMPERATURE]以下になる
     # FINISH->WAIT   : 最高温度が[DETECT_START_TEMPERATURE]以下になる
@@ -146,7 +151,7 @@ def measurement_temperature_and_status():
         if detect_max_temperature >= DETECT_START_TEMPERATURE:
             frame_counter = frame_counter + 1
 
-            if frame_counter >= 15:  # TODO:何フレームにするか要調整
+            if frame_counter >= DETECT_START_FRAMENUM:
                 frame_counter = 0
                 state = "DETECT"    # WAIT->DETECT
 
