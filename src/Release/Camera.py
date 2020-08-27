@@ -38,11 +38,11 @@ def CameraConnectCheck():
     if(cap.isOpened()):
         #読み込み成功
         print ("カメラ読み込み成功")
-        return 1
+        return True
     else:
         #読み込み失敗
         print ("カメラ読み込み失敗")
-        return 0
+        return False
 
 
 #########################################################################################

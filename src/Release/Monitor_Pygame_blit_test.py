@@ -1,10 +1,10 @@
 # coding: utf-8
 
 import cv2
-print(cv2.__version__)
-from PIL import ImageFont, ImageDraw, Image
+#print(cv2.__version__)
+#from PIL import ImageFont, ImageDraw, Image
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 # センサ接続に必要
 import adafruit_amg88xx
@@ -50,60 +50,108 @@ class MySprite(pygame.sprite.Sprite):
 
 ######################  Pygameお試し ############################
 
-def Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels):
+#####################################################################################################
+def display_initialize_cheking():
+    print("display_initialize_cheking")
 
-    # サーモグラフィー表示
+    # Pygameを初期化
+    pygame.init()
 
-    # bicubic補間したデータ
-    #measure_start_time = time.time()
-    #fig = plt.imshow(sensor_pixels, cmap="inferno", interpolation="bicubic")
-    #elapsed_time = time.time() - measure_start_time
-    #print ("  imshow:{0}".format(elapsed_time) + "[sec]")
+    SCR_RECT = Rect(0, 0, 640, 480)
+    lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
+    lcd.fill((0,0,0))                   # 黒
 
-    # plt.colorbar()
+    # 文字を表示(文字表示) ################
+    pygame.font.init()
+    TextColor = (255, 255, 255)         # 白
+    Message = "暫くお待ちください"
 
-    # plt.showだと止まってしまうので、pauseを使用
-    # plt.clfしないとカラーバーが多数表示される
-    #measure_start_time = time.time()
-    #plt.pause(.1)
-    #elapsed_time = time.time() - measure_start_time
-    #print ("  pause:{0}".format(elapsed_time) + "[sec]")
+    font = pygame.font.SysFont("notosansmonocjkjp", 25, bold=True, italic=False)
+    text = font.render(Message, True, TextColor)
+    lcd.blit(text, (200,200))
+    # 文字表示 #############################
 
-    #measure_start_time = time.time()
-    #plt.clf()
-    #elapsed_time = time.time() - measure_start_time
-    #print ("  clf:{0}".format(elapsed_time) + "[sec]")
+    # 画面を更新
+    pygame.display.update()
 
+#####################################################################################################
+def display_initialize_checked(camera_connect_check_result, sensor_connect_check_result):
+    print("display_initialize_checked")
+
+    # Pygameを初期化
+    pygame.init()
+
+    SCR_RECT = Rect(0, 0, 640, 480)
+    lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
+    lcd.fill((0,0,0))                   # 黒
+
+    # 文字を表示(文字表示) ################
+    pygame.font.init()
+    TextColor = (255, 255, 255)         # 白
+
+    if(camera_connect_check_result):
+        camera_text = " カメラの接続に成功しました"
+    else:
+        camera_text = " カメラの接続に失敗しました"
+
+    if(sensor_connect_check_result):
+        sensor_text = " センサの接続に成功しました"
+    else:
+        sensor_text = " センサの接続に失敗しました"
+
+    font1 = pygame.font.SysFont("notosansmonocjkjp", 20, bold=True, italic=False)
+    text1 = font1.render(camera_text, True, TextColor)
+    font2 = pygame.font.SysFont("notosansmonocjkjp", 20, bold=True, italic=False)
+    text2 = font2.render(sensor_text, True, TextColor)
+
+    lcd.blit(text1, (180,200))
+    lcd.blit(text2, (180,230))
+    
+    if((camera_connect_check_result == False) or (sensor_connect_check_result == False)):
+        reboot_text = "電源OFF後、接続を確認して再度電源ONしてください"
+                
+        font3 = pygame.font.SysFont("notosansmonocjkjp", 20, bold=True, italic=False)
+        text3 = font3.render(reboot_text, True, TextColor)
+
+        lcd.blit(text3, (80,270))
+    # 文字表示 #############################
+
+    # 画面を更新
+    pygame.display.update()
+
+#####################################################################################################
+# カメラ画像とサーモグラフィーを表示
+# ToDo：引数整理
+def display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPTH, displayPixelHeight, displayPixelWidth, WIDTH, HEIGHT):
+
+    print("display_camera_thermography_faceframe")
     # カメラ画像を左右反転
     frame_flip_lr = cv2.flip(frame, 1)
 
-    # グレースケール表示
-    measure_start_time = time.time()
-    resize_width = 160
-    resize_height = 160
-    frame_flip_lr_resize = cv2.resize(frame_flip_lr,(resize_width, resize_height))
-    elapsed_time = time.time() - measure_start_time
-    print ("  resize:{0}".format(elapsed_time) + "[sec]")
+    # OpenCVの画像をPygame用に変換
+    pygame_image = convert_opencv_img_to_pygame(frame_flip_lr)
 
-    measure_start_time = time.time()
-    frame_flip_lr_resize_gray = cv2.cvtColor(frame_flip_lr_resize,cv2.COLOR_BGR2GRAY)
-    elapsed_time = time.time() - measure_start_time
-    print ("  cvtColor:{0}".format(elapsed_time) + "[sec]")
+    # カメラ表示
+    lcd.blit(pygame_image, (0, 0))
 
-    # グレースケール(2次元配列)をRGB(3次元配列)に変換する
-    measure_start_time = time.time()
-    frame_flip_lr_resize_gray_array = frame_flip_lr_resize_gray[:, :, None]
+    # サーモ表示 ##########################################################################
+    thermo_offset_x = 0
+    thermo_offset_y = 480 - 160
 
-    height, width = frame_flip_lr_resize_gray.shape
-    x_offset = 0
-    y_offset = HEIGHT - resize_height
+    for ix, row in enumerate(bicubic):
+        for jx, pixel in enumerate(row):
+            pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], \
+                                (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, \
+                                displayPixelHeight, displayPixelWidth))
+    # サーモ表示 ##########################################################################
 
-    frame_flip_lr[y_offset:height + y_offset, x_offset:width + x_offset] = frame_flip_lr_resize_gray_array
-    elapsed_time = time.time() - measure_start_time
-    print ("  other:{0}".format(elapsed_time) + "[sec]")
+    # 顔枠を表示
+    pygame.draw.rect(lcd, (0, 0, 255), (220, 140, 200, 200), 3)
+    pygame.draw.rect(lcd, (0, 0, 255), (220, 90, 200, 300), 3)
 
-    return frame_flip_lr
-
+#####################################################################################################
+# ToDo：引数整理
+#def Monitor_Func(cap, WIDTH, HEIGHT, STATUS):
 def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pixels):
 
     print ("### Monitor_Func ###")
@@ -113,7 +161,6 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     fullscreen_flag = True
 
     ######################  Pygameお試し ############################
-    # Pygameお試し
     # センサ初期化、サイズ設定など
     #low range of the sensor (this will be blue on the screen)
     MINTEMP = 26
@@ -136,8 +183,8 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     grid_x, grid_y = np.mgrid[0:7:32j, 0:7:32j]
 
     #sensor is an 8x8 grid so lets do a square
-    width = 640
-    height = 480
+    #width = 640
+    #height = 480
     
     #the list of colors we can choose from
     blue = Color("indigo")
@@ -160,20 +207,6 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     group = pygame.sprite.RenderUpdates()
     MySprite.containers = group
 
-    # 最終的に描画したいサイズでdisplaySurface作成
-    #final_display_size_h = 1920
-    #final_display_size_v = 1200
-    #pygame.display.set_mode((final_display_size_h, final_display_size_v))
-
-    # 動かしたいサイズで別のSurface作成
-    #lcd = pygame.Surface((width, height))
-    #lcd = pygame.display.set_mode((width, height))
-
-    # 全画面表示
-    #lcd = pygame.display.set_mode((0,0))
-    #lcd = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-    #lcd = pygame.display.set_mode((640,480), pygame.FULLSCREEN)
-
     lcd.fill((255,0,0))
 
     pygame.display.update()
@@ -182,15 +215,6 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     lcd.fill((0,0,0))
     pygame.display.update()
     ######################  Pygameお試し ############################
-
-    ## 本来はSensor.pyでやる処理だが、デバッグ用にここでセンサのインスタンスを取得
-    # センサーの初期化
-    #sensor = adafruit_amg88xx.AMG88XX(i2c_bus, addr=0x68)
-    # センサーの初期化待ち
-    #time.sleep(.1)
-    ## ここまで
-
-    plt.figure(figsize=(1, 1), dpi=160)
 
     while True:
 
@@ -202,19 +226,6 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
         # センサデータ更新
         Sensor.measurement_temperature_and_status()
-
-        ## 本来はSensor.pyでやる処理だが、デバッグ用にここでセンサデータを取得
-        # 8x8の表示
-        # print (sensor.pixels)
-
-        # 温度データ取得＆最高温度の計算
-        #measure_start_time = time.time()
-        #sensor_pixels = sensor.pixels
-        #max_temp = max(itertools.chain.from_iterable(sensor_pixels))
-        #print ("センサ最高温度:" + str(max_temp))
-        #elapsed_time = time.time() - measure_start_time
-        #print ("GetSensorData & CalcMaxTemp:{0}".format(elapsed_time) + "[sec]")
-        ## ここまで
 
         ######################  Pygameお試し ############################
         #read the pixels
@@ -228,136 +239,66 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 	
         #perdorm interpolation
         bicubic = griddata(points, pixels, (grid_x, grid_y), method='cubic')
-        pygame_image_bicubic = pygame.surfarray.make_surface(bicubic)
-        print(pygame_image_bicubic)
+        #pygame_image_bicubic = pygame.surfarray.make_surface(bicubic)
+        #print(pygame_image_bicubic)
 	
-        #draw everything
-        #for ix, row in enumerate(bicubic):
-        #    for jx, pixel in enumerate(row):
-        #        pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (displayPixelHeight * ix, displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
-        #
-        #pygame.display.update()
-
         state = Sensor.get_state()
+        #state = "WAIT"
+        #state = "DETECT"
+        #state = "FINISH"
 
         ######################  Pygameお試し ############################
 
         if(state == "WAIT"):
-            # カメラ画像とサーモグラフィー表示
-            #result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
-            result_frame = frame
-
-            # OpenCVの画像をPygame用に変換
-            pygame_image = convert_opencv_img_to_pygame(result_frame)
-
-            # カメラ表示
-            lcd.blit(pygame_image, (0, 0))
-
-            # サーモ表示 ##########################################################################
-            thermo_offset_x = 0
-            thermo_offset_y = 480 - 160
-
-            for ix, row in enumerate(sensor_pixels):
-                for jx, pixel in enumerate(row):
-                    pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
-            # サーモ表示 ##########################################################################
-
+            # カメラ画像とサーモグラフィーを表示
+            display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPTH, displayPixelHeight, displayPixelWidth, WIDTH, HEIGHT)
+            
+            # スプライトグループを更新
+            group.update()
+            # スプライトグループを描画
+            group.draw(lcd)
             # 画面を更新
             pygame.display.update()
 
-            # 画像表示
-            #cv2.imshow("BodyTemperatureDetection", result_frame)
-            # ウインドウ表示位置指定
-            #cv2.moveWindow("BodyTemperatureDetection", window_display_pos_x,window_display_pos_y)
-
         if(state == "DETECT"):
-            # カメラ画像とサーモグラフィー表示
-            result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
-
-            # 測定中を表示
-            font_path = "/usr/share/fonts/truetype/meiryo.ttc"
-            font_size = 25
-            font_pil = ImageFont.truetype(font_path, font_size)
+            # カメラ画像とサーモグラフィーを表示
+            display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPTH, displayPixelHeight, displayPixelWidth, WIDTH, HEIGHT)
+            
+            # 文字を表示(文字表示) ################
+            pygame.font.init()
+            background_color = (0, 0, 0)
             TextColor = (255, 255, 255)         # 白
-            Text = "測定中"
+            Message = "測定中"
 
-            img_pil = Image.fromarray(result_frame)
-            draw = ImageDraw.Draw(img_pil)
-            positon = (10,280)
-            draw.text(positon, Text, font = font_pil, fill = TextColor)
-            img = np.array(img_pil)
-            cv2.imshow('BodyTemperatureDetection_Text_Detect', img)
+            font = pygame.font.SysFont("notosansmonocjkjp", 15, bold=True, italic=False)
+            text = font.render(Message, True, TextColor, background_color)
+            lcd.blit(text, (0,290))
+            # 文字表示 #############################
+
+            # スプライトグループを更新
+            group.update()
+            # スプライトグループを描画
+            group.draw(lcd)
+            # 画面を更新
+            pygame.display.update()
 
         if(state == "FINISH"):
-            # カメラ画像とサーモグラフィー表示
-            measure_start_time = time.time()
-            #result_frame = Make_Camera_Tthermography(frame, WIDTH, HEIGHT, sensor_pixels)
-            #result_frame = frame
-            elapsed_time = time.time() - measure_start_time
-            print ("1(Make_Camera_Tthermography):{0}".format(elapsed_time) + "[sec]")
-
-            # カメラ画像を左右反転
-            frame_flip_lr = cv2.flip(frame, 1)
-
-            measure_start_time = time.time()
-            # 最高温度表示
+            # カメラ画像とサーモグラフィーを表示
+            display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPTH, displayPixelHeight, displayPixelWidth, WIDTH, HEIGHT)
+            
+            # 文字表示(最高温度、測定結果) ##########
+            pygame.font.init()
+            # 背景色
+            background_color = (0, 0, 0)        # 黒
+            # 最高温度
             MaxTempStr = str(Sensor.get_max_temperature()) + "℃"
-
-            # 温度によって、表示するテキストの色を変える
-            background_color = (0, 0, 0)
+            # 発熱判定によって、表示するテキストの色とメッセージを変える
             if(Sensor.get_isfever() == True):
-                #TextColor = (0, 0, 255)         # 赤
                 TextColor = (255, 0, 0)         # 赤
                 DetectResult = "正確な検温を行ってください。"
             else:
                 TextColor = (0, 255, 0)         # 緑
                 DetectResult = "平熱です。"
-
-            #font_path = "/usr/share/fonts/truetype/meiryo.ttc"
-            #font_size = 25
-            #font_pil = ImageFont.truetype(font_path, font_size)
-            #elapsed_time = time.time() - measure_start_time
-            #print ("2:{0}".format(elapsed_time) + "[sec]")
-
-            #measure_start_time = time.time()
-            #img_pil = Image.fromarray(result_frame)
-            #draw = ImageDraw.Draw(img_pil)
-            #positon = (10,250)
-            #draw.text(positon, MaxTempStr, font = font_pil, fill = TextColor)
-            #img = np.array(img_pil)
-            #elapsed_time = time.time() - measure_start_time
-            #print ("3:{0}".format(elapsed_time) + "[sec]")
-
-            # 測定結果表示
-            #measure_start_time = time.time()
-            #img_pil = Image.fromarray(img)
-            #draw = ImageDraw.Draw(img_pil)
-            #positon = (10,280)
-            #draw.text(positon, DetectResult, font = font_pil, fill = TextColor)
-            #img = np.array(img_pil)     
-            #elapsed_time = time.time() - measure_start_time
-            #print ("4:{0}".format(elapsed_time) + "[sec]")
-
-            # OpenCVの画像をPygame用に変換
-            pygame_image = convert_opencv_img_to_pygame(frame_flip_lr)
-
-            # カメラ表示
-            lcd.blit(pygame_image, (0, 0))
-
-            # サーモ表示 ##########################################################################
-            thermo_offset_x = 0
-            thermo_offset_y = 480 - 160
-
-            for ix, row in enumerate(bicubic):
-                for jx, pixel in enumerate(row):
-                    pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, displayPixelHeight, displayPixelWidth))
-            # サーモ表示 ##########################################################################
-
-            # 顔枠を表示
-            pygame.draw.rect(lcd, (0, 0, 255), (220, 140, 200, 200), 3)
-
-            # 文字表示(最高温度、測定結果) #############################
-            pygame.font.init()
 
             font1 = pygame.font.SysFont("notosansmonocjkjp", 15, bold=True, italic=False)
             text1 = font1.render(MaxTempStr, True, TextColor, background_color)
@@ -369,55 +310,48 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             lcd.blit(text2, (0,290))
             # 文字表示 #############################
 
-            # 描画していたSurfaceを拡大し、その描画先をdisplaySurfaceにする
-            #pygame.transform.scale(lcd, (final_display_size_h, final_display_size_v), pygame.display.get_surface())
-
            # スプライトグループを更新
             group.update()
-
             # スプライトグループを描画
             group.draw(lcd)
-
             # 画面を更新
             pygame.display.update()
 
-            for event in pygame.event.get():
-                print("### event loop ###")
-                print(event.type)
+        #############################################################################
+        # 通常画面と全画面表示の切り替え
+        for event in pygame.event.get():
+            print("### event loop ###")
+            print(event.type)
 
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == KEYDOWN and event.key == K_F2:
-                    print("F2押下！！！！！")
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN and event.key == K_F2:
+                print("F2押下！！！！！")
 
-                    # F2キーでフルスクリーンモードへの切り替え
-                    fullscreen_flag = not fullscreen_flag
-                    print("fullscreen_flag: " + str(fullscreen_flag))
+                # F2キーで通常画面と全画面の切り替え
+                fullscreen_flag = not fullscreen_flag
+                print("fullscreen_flag: " + str(fullscreen_flag))
 
-                    if fullscreen_flag:
-                        print("フルスクリーン")
-                        pygame.display.quit()
-                        pygame.display.init()
-                        lcd = pygame.display.set_mode(SCR_RECT.size, pygame.FULLSCREEN)
-                    else:
-                        print("通常スクリーン")
-                        pygame.display.quit()
-                        pygame.display.init()
-                        lcd = pygame.display.set_mode(SCR_RECT.size, pygame.RESIZABLE)
+                if fullscreen_flag:
+                    print("フルスクリーン")
+                    pygame.display.quit()
+                    pygame.display.init()
+                    lcd = pygame.display.set_mode(SCR_RECT.size, pygame.FULLSCREEN)
+                else:
+                    print("通常スクリーン")
+                    pygame.display.quit()
+                    pygame.display.init()
+                    lcd = pygame.display.set_mode(SCR_RECT.size, pygame.RESIZABLE)
+        #############################################################################
 
-            #measure_start_time = time.time()
-            #cv2.imshow('BodyTemperatureDetection_Finish', img)
-            #elapsed_time = time.time() - measure_start_time
-            #print ("5(imshow):{0}".format(elapsed_time) + "[sec]")
-        
         # キュー入力判定
         # "q"でループから抜ける
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        #if cv2.waitKey(1) & 0xFF == ord('q'):
+        #    break
 
     # VideoCaptureオブジェクト破棄
     # USBカメラを閉じる
-    cap.release()
-    cv2.destroyAllWindows()
+    #cap.release()
+    #cv2.destroyAllWindows()
 

@@ -1,12 +1,15 @@
 # coding: utf-8
 
 import cv2
+import pygame
 #print(cv2.__version__) 
 import configparser
 
 import Camera
 import Sensor
 import Monitor_Pygame_blit_test
+
+import time
 
 ###################################################
 # USBカメラ設定
@@ -52,20 +55,34 @@ def main():
     except:
         print("iniファイルの読み込みに失敗しました。")
 
+    # 初期化画面を表示
+    Monitor_Pygame_blit_test.display_initialize_cheking()
+    time.sleep(1)       # 表示がすぐ切り替わるので少し表示させておく
 
     # カメラ接続確認
-    if(Camera.CameraConnectCheck() == 1):
+    if(Camera.CameraConnectCheck()):
         STATUS = "WAIT"
     else:
     # メッセージを表示(メッセージボックスとか)
         print ("カメラの接続に失敗しました")
-        exit()
+        #exit()
 
     # センサ初期化
     if Sensor.initialize_sensor() == False:
         print ("センサの接続に失敗しました")
-        exit()
+        #exit()
 
+
+    camera_connect_check_result = Camera.CameraConnectCheck()
+    sensor_connect_check_result = Sensor.initialize_sensor()
+    # 初期化画面を表示
+    Monitor_Pygame_blit_test.display_initialize_checked(camera_connect_check_result, sensor_connect_check_result)
+    time.sleep(2)           # 表示がすぐ切り替わるので少し表示させておく
+    if((camera_connect_check_result == False) or (sensor_connect_check_result == False)):
+        time.sleep(3)       # 表示がすぐ切り替わるので少し表示させておく
+        # ユーザー向けには画面はずっと表示したままの方が良さそう
+        # exitするとターミナルが見えるので
+        exit()
 
     try:
         while True:
@@ -88,7 +105,10 @@ def main():
         # VideoCaptureオブジェクト破棄
         # キャプチャデバイス(USBカメラ)を終了する
         cap.release()
-        cv2.destroyAllWindows()
+        #cv2.destroyAllWindows()
+
+        # Pygameの終了(画面閉じる)
+        pygame.quit()
 
 if __name__ == '__main__':
     main()
