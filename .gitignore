@@ -3,3 +3,6 @@ doc/~$*
 
 # Python cache
 __pycache__
+
+# OS file(Mac only)
+.DS_Store
