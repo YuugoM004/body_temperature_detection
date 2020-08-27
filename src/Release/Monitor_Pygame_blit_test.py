@@ -154,7 +154,7 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
     pygame.init()
 
     SCR_RECT = Rect(0, 0, 640, 480)
-    lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
+    lcd = pygame.display.set_mode(SCR_RECT.size, pygame.FULLSCREEN)
 
     # スプライトグループを作成してスプライトクラスに割り当て
     group = pygame.sprite.RenderUpdates()
@@ -397,7 +397,9 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
 
                     if fullscreen_flag:
                         print("フルスクリーン")
-                        lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
+                        pygame.display.quit()
+                        pygame.display.init()
+                        lcd = pygame.display.set_mode(SCR_RECT.size, pygame.RESIZABLE)
                     else:
                         print("通常スクリーン")
                         lcd = pygame.display.set_mode(SCR_RECT.size)
