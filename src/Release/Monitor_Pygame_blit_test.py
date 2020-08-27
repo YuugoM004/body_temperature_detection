@@ -399,10 +399,12 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
                         print("フルスクリーン")
                         pygame.display.quit()
                         pygame.display.init()
-                        lcd = pygame.display.set_mode(SCR_RECT.size, pygame.RESIZABLE)
+                        lcd = pygame.display.set_mode(SCR_RECT.size, pygame.FULLSCREEN)
                     else:
                         print("通常スクリーン")
-                        lcd = pygame.display.set_mode(SCR_RECT.size)
+                        pygame.display.quit()
+                        pygame.display.init()
+                        lcd = pygame.display.set_mode(SCR_RECT.size, pygame.RESIZABLE)
 
             #measure_start_time = time.time()
             #cv2.imshow('BodyTemperatureDetection_Finish', img)
