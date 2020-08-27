@@ -98,7 +98,21 @@ def initialize_sensor():
     logging.debug("start")
 
     # センサの接続確認
-    result = sensor_connect_check()
+    #result = sensor_connect_check()
+
+    if SENSOR_CONNECTED == 1:
+        # センサーの初期化
+        try:
+            global sensor
+            sensor = Adafruit_AMG88xx()
+            # センサーの初期化待ち
+            time.sleep(.1)
+            result = True
+        except:
+            result = False
+
+    else:
+        result = True
 
     # センサ出力安定まで待機
     print(" センサ出力安定まで待機: {0} sec".format(WAIT_TIME))
