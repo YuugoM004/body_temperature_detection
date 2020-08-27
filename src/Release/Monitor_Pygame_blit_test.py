@@ -321,9 +321,9 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
             TextColor = (255, 255, 255)         # 白
             Message = "測定中"
 
-            font = pygame.font.SysFont("notosansmonocjkjp", 15, bold=True, italic=False)
+            font = pygame.font.SysFont("notosansmonocjkjp", 20, bold=True, italic=False)
             text = font.render(Message, True, TextColor, background_color)
-            lcd.blit(text, (0,290))
+            lcd.blit(text, (0,280))
             # 文字表示 #############################
 
             # スプライトグループを更新
@@ -351,13 +351,13 @@ def Monitor_Func(cap, WIDTH, HEIGHT, max_temp_fix, STATUS, DETECT_TH, sensor_pix
                 TextColor = (0, 255, 0)         # 緑
                 DetectResult = "平熱です。"
 
-            font1 = pygame.font.SysFont("notosansmonocjkjp", 15, bold=True, italic=False)
+            font1 = pygame.font.SysFont("notosansmonocjkjp", 20, bold=True, italic=False)
             text1 = font1.render(MaxTempStr, True, TextColor, background_color)
 
             font2 = pygame.font.SysFont("notosansmonocjkjp", 15, bold=True, italic=False)
             text2 = font2.render(DetectResult, True, TextColor, background_color)
 
-            lcd.blit(text1, (0,260))
+            lcd.blit(text1, (0,250))
             lcd.blit(text2, (0,290))
             # 文字表示 #############################
 
