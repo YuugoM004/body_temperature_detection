@@ -68,14 +68,9 @@ def main():
         print ("カメラの接続に失敗しました")
         #exit()
 
-    # センサ初期化
-    if Sensor.initialize_sensor() == False:
-        print ("センサの接続に失敗しました")
-        #exit()
-
-
     camera_connect_check_result = Camera.camera_connect_check()
     sensor_connect_check_result = Sensor.initialize_sensor()
+
     # 初期化画面(接続確認結果)を表示
     Monitor_Pygame_blit_test.display_initialize_checked(camera_connect_check_result, sensor_connect_check_result)
     time.sleep(2)           # 表示がすぐ切り替わるので少し表示させておく
