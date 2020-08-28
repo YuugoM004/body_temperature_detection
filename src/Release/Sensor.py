@@ -65,28 +65,6 @@ def set_sensor_parameter(sensor_connected, wait_time, correction_value, detect_s
 
 
 ##################################################################
-def sensor_connect_check():
-    """センサの接続確認
-
-    :return センサの接続結果(True:接続成功/False:接続失敗)
-    """
-
-    print("[" + os.path.basename(__file__) + "]" + sys._getframe().f_code.co_name)
-
-    if SENSOR_CONNECTED == 1:
-        # センサーの初期化
-        global sensor
-        sensor = Adafruit_AMG88xx()
-        # センサーの初期化待ち
-        time.sleep(.1)
-        result = True
-
-    else:
-        result = True
-
-    return result
-
-##################################################################
 def initialize_sensor():
     """センサの初期化
 
@@ -96,9 +74,6 @@ def initialize_sensor():
     print("[" + os.path.basename(__file__) + "]" + sys._getframe().f_code.co_name)
 
     logging.debug("start")
-
-    # センサの接続確認
-    #result = sensor_connect_check()
 
     if SENSOR_CONNECTED == 1:
         # センサーの初期化
