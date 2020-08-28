@@ -92,6 +92,7 @@ def display_initialize_cheking():
 
     # Pygameを初期化
     pygame.init()
+    pygame.mouse.set_visible(False)
 
     SCR_RECT = Rect(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT)
     lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
@@ -117,6 +118,7 @@ def display_initialize_checked(camera_connect_check_result, sensor_connect_check
 
     # Pygameを初期化
     pygame.init()
+    pygame.mouse.set_visible(False)
 
     SCR_RECT = Rect(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT)
     lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
@@ -158,6 +160,7 @@ def display_turnoff():
 
     # Pygameを初期化
     pygame.init()
+    pygame.mouse.set_visible(False)
 
     SCR_RECT = Rect(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT)
     lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
@@ -199,6 +202,7 @@ def display_turnoff():
                     # 全画面
                     pygame.display.quit()
                     pygame.display.init()
+                    pygame.mouse.set_visible(False)
                     lcd = pygame.display.set_mode(SCR_RECT.size, pygame.FULLSCREEN)
                 else:
                     # 通常画面
@@ -405,6 +409,7 @@ def display_wait_detect_finish(cap):
                     # 全画面
                     pygame.display.quit()
                     pygame.display.init()
+                    pygame.mouse.set_visible(False)
                     lcd = pygame.display.set_mode(SCR_RECT.size, pygame.FULLSCREEN)
                 else:
                     # 通常画面
