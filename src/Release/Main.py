@@ -6,7 +6,7 @@ import configparser
 
 import Camera
 import Sensor
-import Monitor_Pygame_blit_test
+import Monitor
 
 #########################################################################################
 def main():
