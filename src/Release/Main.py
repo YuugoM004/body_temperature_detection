@@ -35,8 +35,8 @@ def main():
                                 float(ini['SENSOR']['FEVER_TEMPERATURE'])
                                 )
 
-        # モニタにiniファイルの内容を設定
-        Monitor_Pygame_blit_test.set_monitor_parameter( \
+    # モニタにiniファイルの内容を設定
+    Monitor_Pygame_blit_test.set_monitor_parameter( \
                                 int(ini['MONITOR']['CAMERA_WIDTH']), \
                                 int(ini['MONITOR']['CAMERA_HEIGHT']), \
                                 int(ini['MONITOR']['THERMO_WIDTH']), \
