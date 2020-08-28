@@ -15,11 +15,55 @@ from colour import Color
 
 import Sensor
 
+########################################################
+# デフォルト(iniファイルからの読み込みで上書き)
+# カメラ表示の幅
+CAMERA_WIDTH = 640
+# カメラ表示の高さ
+CAMERA_HEIGHT = 480
+# サーモ表示の幅
+THERMO_WIDTH = 160
+# サーモ表示の高さ
+THERMO_HEIGHT = 160
+
+# センサ設定    
+#low range of the sensor (this will be blue on the screen)
+THERMO_MINTEMP = 26
+#high range of the sensor (this will be red on the screen)
+THERMO_MAXTEMP = 37.5
+#how many color values we can have
+THERMO_COLORDEPTH = 1024
+
 #####################################################################################################
 class MySprite(pygame.sprite.Sprite):
     def __init__(self, filename, x, y, vx, vy):
         # デフォルトグループをセット
         pygame.sprite.Sprite.__init__(self, self.containers)
+
+#####################################################################################################
+# iniファイルのパラメータを設定
+def set_monitor_parameter(camera_width, camera_height, thermo_width, thermo_height, thermo_mintemp, thermo_maxtemp, thermo_colordepth):
+
+    global CAMERA_WIDTH
+    CAMERA_WIDTH = camera_width
+
+    global CAMERA_HEIGHT
+    CAMERA_HEIGHT = camera_height
+
+    global THERMO_WIDTH
+    THERMO_WIDTH = thermo_width
+
+    global THERMO_HEIGHT
+    THERMO_HEIGHT = thermo_height
+
+    global THERMO_MINTEMP
+    THERMO_MINTEMP = thermo_mintemp
+
+    global THERMO_MAXTEMP
+    THERMO_MAXTEMP = thermo_maxtemp
+
+    global THERMO_COLORDEPTH
+    THERMO_COLORDEPTH = thermo_colordepth
 
 #####################################################################################################
 def constrain(val, min_val, max_val):
@@ -49,7 +93,7 @@ def display_initialize_cheking():
     # Pygameを初期化
     pygame.init()
 
-    SCR_RECT = Rect(0, 0, 640, 480)
+    SCR_RECT = Rect(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT)
     lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
     lcd.fill((0,0,0))                   # 黒
 
@@ -74,7 +118,7 @@ def display_initialize_checked(camera_connect_check_result, sensor_connect_check
     # Pygameを初期化
     pygame.init()
 
-    SCR_RECT = Rect(0, 0, 640, 480)
+    SCR_RECT = Rect(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT)
     lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
     lcd.fill((0,0,0))                   # 黒
 
@@ -115,7 +159,7 @@ def display_turnoff():
     # Pygameを初期化
     pygame.init()
 
-    SCR_RECT = Rect(0, 0, 640, 480)
+    SCR_RECT = Rect(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT)
     lcd = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN)
     
     # スプライトグループを作成してスプライトクラスに割り当て
@@ -164,8 +208,7 @@ def display_turnoff():
 
 #####################################################################################################
 # カメラ画像とサーモグラフィーを表示
-# ToDo：引数整理
-def display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPTH, displayPixelHeight, displayPixelWidth, WIDTH, HEIGHT):
+def display_camera_thermography_faceframe(frame, bicubic, lcd, colors, displayPixelHeight, displayPixelWidth):
 
     print("display_camera_thermography_faceframe")
     # カメラ画像を左右反転
@@ -179,11 +222,11 @@ def display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPT
 
     # サーモ表示 ##########################################################################
     thermo_offset_x = 0
-    thermo_offset_y = 480 - 160
+    thermo_offset_y = CAMERA_HEIGHT - THERMO_HEIGHT
 
     for ix, row in enumerate(bicubic):
         for jx, pixel in enumerate(row):
-            pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, COLORDEPTH- 1)], \
+            pygame.draw.rect(lcd, colors[constrain(int(pixel), 0, THERMO_COLORDEPTH- 1)], \
                                 (thermo_offset_x + displayPixelHeight * ix, thermo_offset_y + displayPixelWidth * jx, \
                                 displayPixelHeight, displayPixelWidth))
     # サーモ表示 ##########################################################################
@@ -192,8 +235,7 @@ def display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPT
     pygame.draw.rect(lcd, (0, 0, 255), (220, 90, 200, 300), 3)
 
 #####################################################################################################
-# ToDo：引数整理
-def display_wait_detect_finish(cap, WIDTH, HEIGHT):
+def display_wait_detect_finish(cap):
 
     print ("### Monitor_Func ###")
 
@@ -201,13 +243,6 @@ def display_wait_detect_finish(cap, WIDTH, HEIGHT):
     fullscreen_flag = True
 
     # センサ設定 ############################################################################
-    #low range of the sensor (this will be blue on the screen)
-    MINTEMP = 26
-    #high range of the sensor (this will be red on the screen)
-    MAXTEMP = 37.5
-    #how many color values we can have
-    COLORDEPTH = 1024
-
     os.putenv('SDL_FBDEV', '/dev/fb1')
 
     points = [(math.floor(ix / 8), (ix % 8)) for ix in range(0, 64)]
@@ -215,21 +250,21 @@ def display_wait_detect_finish(cap, WIDTH, HEIGHT):
 
     #the list of colors we can choose from
     blue = Color("indigo")
-    colors = list(blue.range_to(Color("red"), COLORDEPTH))
+    colors = list(blue.range_to(Color("red"), THERMO_COLORDEPTH))
 
     #create the array of colors
     colors = [(int(c.red * 255), int(c.green * 255), int(c.blue * 255)) for c in colors]
     # センサ設定 ############################################################################
 
     # センサからの32x32配列データを160x160で表示する
-    displayPixelHeight = 160 / 32
-    displayPixelWidth = 160 / 32
+    displayPixelWidth = THERMO_WIDTH / 32
+    displayPixelHeight = THERMO_HEIGHT / 32
 
     # Pygame設定 ############################################################################
     # Pygameを初期化
     pygame.init()
 
-    SCR_RECT = Rect(0, 0, 640, 480)
+    SCR_RECT = Rect(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT)
     lcd = pygame.display.set_mode(SCR_RECT.size, pygame.FULLSCREEN)
 
     clock = pygame.time.Clock()
@@ -237,7 +272,7 @@ def display_wait_detect_finish(cap, WIDTH, HEIGHT):
     BLINK_EVENT = pygame.USEREVENT + 0
 
     # イベント(文字の点滅)の周期を設定
-    pygame.time.set_timer(BLINK_EVENT, 500)
+    pygame.time.set_timer(BLINK_EVENT, 500)     # ms
 
     # スプライトグループを作成してスプライトクラスに割り当て
     group = pygame.sprite.RenderUpdates()
@@ -264,7 +299,7 @@ def display_wait_detect_finish(cap, WIDTH, HEIGHT):
         # センサから配列データを取得
         pixels = Sensor.get_temperature_array()
         print (pixels)
-        pixels = [mapping(p, MINTEMP, MAXTEMP, 0, COLORDEPTH - 1) for p in pixels]
+        pixels = [mapping(p, THERMO_MINTEMP, THERMO_MAXTEMP, 0, THERMO_COLORDEPTH - 1) for p in pixels]
 	
         # bicubic補間
         bicubic = griddata(points, pixels, (grid_x, grid_y), method='cubic')
@@ -274,7 +309,7 @@ def display_wait_detect_finish(cap, WIDTH, HEIGHT):
 
         if(state == "WAIT"):        # 待機中
             # カメラ画像とサーモグラフィーを表示
-            display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPTH, displayPixelHeight, displayPixelWidth, WIDTH, HEIGHT)
+            display_camera_thermography_faceframe(frame, bicubic, lcd, colors, displayPixelHeight, displayPixelWidth)
             
             # スプライトグループを更新
             group.update()
@@ -285,7 +320,7 @@ def display_wait_detect_finish(cap, WIDTH, HEIGHT):
 
         if(state == "DETECT"):      # 測定中
             # カメラ画像とサーモグラフィーを表示
-            display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPTH, displayPixelHeight, displayPixelWidth, WIDTH, HEIGHT)
+            display_camera_thermography_faceframe(frame, bicubic, lcd, colors, displayPixelHeight, displayPixelWidth)
             
             # 文字を表示(文字表示) ################
             pygame.font.init()
@@ -294,10 +329,8 @@ def display_wait_detect_finish(cap, WIDTH, HEIGHT):
             Message = "測定中"
 
             font = pygame.font.SysFont("notosansmonocjkjp", 20, bold=True, italic=False)
-            #text = font.render(Message, True, TextColor, background_color)
             on_text = font.render(Message, True, TextColor, background_color)
             blink_rect = on_text.get_rect()
-            #blink_rect.center = lcd_rect.center
 
             off_text = pygame.Surface(blink_rect.size)
             blink_surfaces = cycle([on_text, off_text])
@@ -324,7 +357,7 @@ def display_wait_detect_finish(cap, WIDTH, HEIGHT):
 
         if(state == "FINISH"):       # 測定終了
             # カメラ画像とサーモグラフィーを表示
-            display_camera_thermography_faceframe(frame, bicubic, lcd, colors, COLORDEPTH, displayPixelHeight, displayPixelWidth, WIDTH, HEIGHT)
+            display_camera_thermography_faceframe(frame, bicubic, lcd, colors, displayPixelHeight, displayPixelWidth)
             
             # 文字表示(最高温度、測定結果) ##########
             pygame.font.init()

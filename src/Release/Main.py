@@ -8,25 +8,7 @@ import Camera
 import Sensor
 import Monitor_Pygame_blit_test
 
-###################################################
-# USBカメラ設定
-# デバイスID
-DEVICE_ID = 0
-# ウインドウの幅
-WIDTH = 640
-# ウインドウの高さ
-HEIGHT = 480
- # フレームレート
-FPS = 10
-###################################################
-# ステータス(WAIT/DETECT/FINISH)
-STATUS = "NONE"
-# 測定開始の閾値
-DETECT_START_END_TH = 35
-# 測定結果の閾値
-DETECT_TH = 37.5
-###################################################
-
+#########################################################################################
 def main():
     # iniファイル読み込み
     ini = configparser.ConfigParser()
@@ -53,19 +35,25 @@ def main():
                                 float(ini['SENSOR']['FEVER_TEMPERATURE'])
                                 )
 
+        # モニタにiniファイルの内容を設定
+        Monitor_Pygame_blit_test.set_monitor_parameter( \
+                                int(ini['MONITOR']['CAMERA_WIDTH']), \
+                                int(ini['MONITOR']['CAMERA_HEIGHT']), \
+                                int(ini['MONITOR']['THERMO_WIDTH']), \
+                                int(ini['MONITOR']['THERMO_HEIGHT']), \
+                                float(ini['MONITOR']['THERMO_MINTEMP']), \
+                                float(ini['MONITOR']['THERMO_MAXTEMP']), \
+                                int(ini['MONITOR']['THERMO_COLORDEPTH'])
+                                )
+
     # 初期化画面を表示
     Monitor_Pygame_blit_test.display_initialize_cheking()
     time.sleep(1)       # 表示がすぐ切り替わるので少し表示させておく
 
     # カメラ接続確認
-    if(Camera.camera_connect_check()):
-        STATUS = "WAIT"
-    else:
-    # メッセージを表示(メッセージボックスとか)
-        print ("カメラの接続に失敗しました")
-        #exit()
-
     camera_connect_check_result = Camera.camera_connect_check()
+
+    # センサ初期化(センサ接続確認)
     sensor_connect_check_result = Sensor.initialize_sensor()
 
     # 初期化画面(接続確認結果)を表示
@@ -81,13 +69,8 @@ def main():
             # カメラ制御
             cap = Camera.get_camera_capture()
 
-            # センサ制御
-            #sensor_pixels, max_temp, STATUS = Sensor.Sensor_Func(DETECT_START_END_TH)
-            #print ("STATUS:" + STATUS)
-            #print ("最高温度:" + str(max_temp))
-
             # モニタ制御
-            Monitor_Pygame_blit_test.display_wait_detect_finish(cap, WIDTH, HEIGHT)
+            Monitor_Pygame_blit_test.display_wait_detect_finish(cap)
 
     # 終了処理
     # "Ctrl+C"でループから抜ける
@@ -101,6 +84,7 @@ def main():
         # Pygameの終了(画面閉じる)
         pygame.quit()
 
+#########################################################################################
 if __name__ == '__main__':
     main()
 
