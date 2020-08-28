@@ -36,7 +36,7 @@ def main():
                                 )
 
     # モニタにiniファイルの内容を設定
-    Monitor_Pygame_blit_test.set_monitor_parameter( \
+    Monitor.set_monitor_parameter( \
                                 int(ini['MONITOR']['CAMERA_WIDTH']), \
                                 int(ini['MONITOR']['CAMERA_HEIGHT']), \
                                 int(ini['MONITOR']['THERMO_WIDTH']), \
@@ -47,7 +47,7 @@ def main():
                                 )
 
     # 初期化画面を表示
-    Monitor_Pygame_blit_test.display_initialize_cheking()
+    Monitor.display_initialize_cheking()
     time.sleep(2)       # 表示がすぐ切り替わるので少し表示させておく
 
     # カメラ接続確認
@@ -57,12 +57,12 @@ def main():
     sensor_connect_check_result = Sensor.initialize_sensor()
 
     # 初期化画面(接続確認結果)を表示
-    Monitor_Pygame_blit_test.display_initialize_checked(camera_connect_check_result, sensor_connect_check_result)
+    Monitor.display_initialize_checked(camera_connect_check_result, sensor_connect_check_result)
     time.sleep(2)           # 表示がすぐ切り替わるので少し表示させておく
 
     if((camera_connect_check_result == False) or (sensor_connect_check_result == False)):
         # 電源OFF画面を表示
-        Monitor_Pygame_blit_test.display_turnoff()
+        Monitor.display_turnoff()
 
     try:
         while True:
@@ -70,7 +70,7 @@ def main():
             cap = Camera.get_camera_capture()
 
             # モニタ制御
-            Monitor_Pygame_blit_test.display_wait_detect_finish(cap)
+            Monitor.display_wait_detect_finish(cap)
 
     # 終了処理
     # "Ctrl+C"でループから抜ける
