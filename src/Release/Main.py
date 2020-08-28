@@ -48,7 +48,7 @@ def main():
 
     # 初期化画面を表示
     Monitor_Pygame_blit_test.display_initialize_cheking()
-    time.sleep(1)       # 表示がすぐ切り替わるので少し表示させておく
+    time.sleep(2)       # 表示がすぐ切り替わるので少し表示させておく
 
     # カメラ接続確認
     camera_connect_check_result = Camera.camera_connect_check()
