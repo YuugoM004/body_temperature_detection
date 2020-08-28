@@ -1,15 +1,12 @@
 # coding: utf-8
 
-#import cv2
+import time
 import pygame
-#print(cv2.__version__) 
 import configparser
 
 import Camera
 import Sensor
 import Monitor_Pygame_blit_test
-
-import time
 
 ###################################################
 # USBカメラ設定
@@ -90,7 +87,7 @@ def main():
             #print ("最高温度:" + str(max_temp))
 
             # モニタ制御
-            Monitor_Pygame_blit_test.Monitor_Func(cap, WIDTH, HEIGHT, 0, "WAIT", 0, [])
+            Monitor_Pygame_blit_test.display_wait_detect_finish(cap, WIDTH, HEIGHT)
 
     # 終了処理
     # "Ctrl+C"でループから抜ける
@@ -100,7 +97,6 @@ def main():
         # VideoCaptureオブジェクト破棄
         # キャプチャデバイス(USBカメラ)を終了する
         cap.release()
-        #cv2.destroyAllWindows()
 
         # Pygameの終了(画面閉じる)
         pygame.quit()
