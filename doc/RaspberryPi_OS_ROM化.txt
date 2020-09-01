@@ -1,0 +1,34 @@
+== Raspberry Pi OSのROM化検討 ==
+
+佐藤さんのチケットから環境を導入
+https://inside3.sobal.co.jp/redmine-gen/issues/11134
+
+#セットアップ　の部分を実施してrebootするとrom化になっている。
+確認方法
+dfコマンドでマウント位置の箇所にroot-roやboot-roが表示される。
+
+
+#有効化の部分について
+/mnt/root-roや/mnt/boot-roに対して書込み禁止にしたいときに行うコマンド
+（今のところ使わないかな）
+
+#無効化の部分
+/mnt/root-roや/mnt/boot-roに対して書込み可能状態にするコマンド
+
+
+#セットアップ適用後に対してrom on/offスクリプトを作ったので覗いてみてください。
+rom-on_off.sh
+
+※注意
+raspberry piのshコマンドはdashに割り当てられているので
+sh rom-on_off.shとすると動きません。
+bash rom-on_off.sh等で実行してください。
+
+
+
+参考サイト
+ラズパイをrom化する(1)
+https://yrhw0609.hatenablog.com/entry/2019/06/15/221559
+
+ラズパイをrom化する(2) - 解除方法
+https://yrhw0609.hatenablog.com/entry/2019/06/15/222355
