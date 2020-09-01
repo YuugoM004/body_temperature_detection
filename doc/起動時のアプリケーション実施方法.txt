@@ -1,0 +1,45 @@
+== 起動したら自動でアプリケーションを実施する方法 ==
+1.当初は以下のwebページを参考
+
+Raspberry Piでプログラムを自動起動する5種類の方法を比較・解説
+https://qiita.com/karaage0703/items/ed18f318a1775b28eab4
+
+実験は2.autostartを採用
+
+
+ただ、今回のアプリではコンソールにログを表示しないとフレームレートが落ちる
+と目視確認したので別で検索
+
+
+ラズパイを起動したら、ターミナルを開いてシェルを実行する方法
+https://qiita.com/tonosamart/items/f59daa481f90c85a8a99
+
+設定ファイル名はThermalCamera.desktopにしました。
+(.desktopがついていればOKみたい)
+
+
+2.森保さんのひな型をちょっと修正
+body_temperature_detection/src/sample_moriyasu/Detect_MultiThread/Detect_MultiThread.sh
+
+#!/bin/bashの下に以下を追記・変更
+
+export PYTHONPATH={GitのリポジトリをcloneしたDir}/body_temperature_detection/src/Release
+#python Main.py
+python ${PYTHONPATH}/Main.py
+
+
+ファイルのパーミッションを+xして/usr/local/binに配置
+
+3.ThermalCamera.desktop編集
+
+#--これ以下
+[Desktop Entry]
+Exec=lxterminal -e /usr/local/bin/Detect_MultiThread.sh
+Type=Application
+Name=ThermalCamera
+Terminal=true
+#--ここまで
+
+lxterminal -eが効いている
+
+再起動すると、自動で実行しました。
