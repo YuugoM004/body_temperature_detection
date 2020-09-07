@@ -19,6 +19,9 @@ cap.set(cv2.CAP_PROP_FPS, FPS)
 
 # 顔検出ファイル
 face_cascade = cv2.CascadeClassifier('./haarcascade_frontalface_default.xml')
+# face_cascade = cv2.CascadeClassifier('./haarcascade_frontalface_alt2.xml')
+# face_cascade = cv2.CascadeClassifier('./haarcascade_eye.xml')
+
 
 while True:
         # 時間計測
@@ -26,12 +29,19 @@ while True:
 
         # 画像取得、グレースケール変換
         ret, img = cap.read()
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        height, width, color = img.shape
+
+        resize_img = cv2.resize(img, (int(width / 2), int(height / 2)))
+        gray = cv2.cvtColor(resize_img, cv2.COLOR_BGR2GRAY)
 
         # 顔認識
-        faces = face_cascade.detectMultiScale(gray, 1.1, 5)
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.11, minNeighbors=3, minSize=(60, 60))
+        # faces = face_cascade.detectMultiScale(gray, scaleFactor=1.11, minNeighbors=6, minSize=(6, 6), maxSize=(60, 60))
 
         # print(len(faces))
+
+        faces = faces * 2
 
         # 処理時間算出
         time_end = time.time()
