@@ -3,6 +3,7 @@
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.flake8Args": [
+        "--ignore=E712",
         "--max-line-length=99",
     ],
 }
